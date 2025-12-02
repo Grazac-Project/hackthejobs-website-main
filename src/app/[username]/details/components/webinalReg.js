@@ -16,6 +16,9 @@ import { FaCalendarDays } from "react-icons/fa6";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
 import PaystackPop from "@paystack/inline-js";
+import Cookies from "js-cookie";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 function useCountdown(targetDate) {
   const target = useMemo(() => new Date(targetDate).getTime(), [targetDate]);
   const [timeLeft, setTimeLeft] = useState(() =>
@@ -37,12 +40,7 @@ function useCountdown(targetDate) {
   return { days, hours, minutes, seconds, finished: totalSeconds === 0 };
 }
 
-const WebinarModal = ({
-  webinarId,
-  token,
-provider,
-  onClick,
-}) => {
+const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
   const [webData, setWebData] = useState({});
   const [singleWebData, setSingleWebData] = useState({});
   const [loading, setLoading] = useState(false);
@@ -55,6 +53,7 @@ provider,
     email: "",
   });
   const [error, setError] = useState(false);
+   const router = useRouter();
 
   let userId;
   let userFirstName;
@@ -84,19 +83,19 @@ provider,
       });
   }, [webinarId, token]);
 
-  useEffect(() => {
-    const prevHtmlOverflow = document.documentElement.style.overflow;
-    const prevBodyOverflow = document.body.style.overflow;
+  // useEffect(() => {
+  //   const prevHtmlOverflow = document.documentElement.style.overflow;
+  //   const prevBodyOverflow = document.body.style.overflow;
 
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
+  //   document.documentElement.style.overflow = "hidden";
+  //   document.body.style.overflow = "hidden";
 
-    return () => {
-      document.documentElement.style.overflow = prevHtmlOverflow;
-      document.body.style.overflow = prevBodyOverflow;
-    };
-  }, []);
-
+  //   return () => {
+  //     document.documentElement.style.overflow = prevHtmlOverflow;
+  //     document.body.style.overflow = prevBodyOverflow;
+  //   };
+  // }, []);
+console.log({link})
   const startsAt = webData?.startTime;
 
   const { days, hours, minutes, seconds, finished } = useCountdown(startsAt);
@@ -144,44 +143,43 @@ provider,
       try {
         const res = await fincraWebinarCheckoutData(data, token);
 
-if (provider === "paystack") {
-        console.log(res?.data?.data?.paystack);
-        console.log("Payment via Paystack selected");
-        console.log(
-          "Payment Data:",
-          res?.data?.data?.data?.paystack?.access_code
-        );
+        if (provider === "paystack") {
+          console.log(res?.data?.data?.paystack);
+          console.log("Payment via Paystack selected");
+          console.log(
+            "Payment Data:",
+            res?.data?.data?.data?.paystack?.access_code
+          );
 
-        const accessCode = res?.data?.data?.data?.paystack?.access_code;
+          const accessCode = res?.data?.data?.data?.paystack?.access_code;
 
-        if (accessCode) {
-          console.log("Paystack Access Code.......:", accessCode);
-          const popup = new PaystackPop();
-          popup.resumeTransaction(accessCode, {
-            onCancel: () => {
-              console.log("this is being cancelled...");
-            },
-            onError: () => {
-              console.log(" error");
-            },
-            onLoad: () => {
-              console.log("this is being loaded..");
-            },
-            onSuccess: () => {
-              setShowMain(true);
-              setShowModal(false);
-              setCheckout(false);
-              setLoader(false);
-              // setIsSuccess(true);
-              successPaymentModal();
-              setLoading("Make Payment");
-            },
-          });
-          return;
+          if (accessCode) {
+            console.log("Paystack Access Code.......:", accessCode);
+            const popup = new PaystackPop();
+            popup.resumeTransaction(accessCode, {
+              onCancel: () => {
+                console.log("this is being cancelled...");
+              },
+              onError: () => {
+                console.log(" error");
+              },
+              onLoad: () => {
+                console.log("this is being loaded..");
+              },
+              onSuccess: () => {
+                setShowMain(true);
+                setShowModal(false);
+                setCheckout(false);
+                setLoader(false);
+                // setIsSuccess(true);
+                successPaymentModal();
+                setLoading("Make Payment");
+              },
+            });
+            return;
+          }
         }
-      }
 
-        
         reference = res.data?.data?.payment?.reference;
         // console.log("reference", reference);
       } catch (err) {
@@ -309,8 +307,8 @@ if (provider === "paystack") {
             <Load />
           ) : (
             <div className="flex sm:flex-wrap gap-[35px] md:gap-4 ">
-              <div className="mt-8 lg:mt-0 w-[308px] lg:w-[45%] md:w-full">
-                <div className="overflow-hidden rounded-2xl shadow-sm">
+              <div className="mt-8 lg:mt-0 w-[602px] lg:w-[45%] md:w-full rounded-xl p-2 border-[1px] border-[#EDEDED] shadow-sm">
+                <div className="overflow-hidden rounded-xl shadow-sm">
                   <img
                     src={webData?.thumbnail}
                     alt="Event poster"
@@ -322,155 +320,140 @@ if (provider === "paystack") {
               {/* Right content */}
               <div className="flex flex-col gap-6 w-[55%] md:w-full">
                 <div className="pt-10 lg:pt-2 ">
-                  <h3 className="mb-2 font-semibold leading-[120%] text-[28px]  text-[#000000]">
+                  <h3 className="mb-2 font-semibold leading-[120%] text-[24px]  text-[#000000]">
                     {webData?.title}
                   </h3>
-                  <p className="mt-3 text-[#787878] text-[14px]">
+                  <p className="mt-3 text-[#787878] text-[14px] line-clamp-3">
                     {webData?.description}
                   </p>
+
+                  <button
+                    onClick={() => router.push(link)}
+                    className="mt-2 text-[#1453FF] text-[14px] font-medium hover:underline"
+                  >
+                    View more
+                  </button>
                 </div>
 
-                {/* Amount */}
-                <div>
-                  <span className="inline-flex items-center gap-2 rounded-lg border border-[#EAEAEA] bg-[#FAFAFA] px-3 py-2 ">
-                    <span className=" bg-white px-2 py-1 text-xs font-medium text-[#333333]">
-                      Amount:
-                    </span>
-                    <span className="text-[#333333] text-base">
-                      {webData?.type !== "free"
-                        ? `${getCurrencySymbol(webData?.currency)}${formatPrice(
-                            webData?.amount
-                          )}`
-                        : webData?.type}
-                    </span>
-                  </span>
-                </div>
+                {/* Event Details Card */}
+                <div className="rounded-lg border border-[#EAEAEA] bg-[#FAFAFA] p-6">
+                  <h4 className="text-[16px] font-semibold text-[#000000] mb-4">
+                    Event Details
+                  </h4>
 
-                {/* Date & Time + Countdown */}
-                <div className="flex md:flex-wrap gap-6">
-                  {/* Date & Time */}
-                  <div className=" ">
-                    <div className="text-xs font-medium text-[#333333]">
-                      Date & Time
+                  {/* Date */}
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-5 h-5 flex items-center justify-center mt-0.5">
+                      <FaCalendarDays className="text-[#292D32] text-[18px]" />
                     </div>
-                    <div className="mt-3 flex items-center gap-4 p-2 rounded-lg bg-[#FAFAFA]">
-                      {/* Badge */}
-
-                      <div className=" rounded-[6px] px-[6px] py-1 w-[38px] h-[43px] shadow-md">
-                        <div className=" bg-blue-100  text-center text-[10px] font-bold  text-primary">
-                          {webData?.date
-                            ? new Date(webData?.date).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                }
-                              )
-                            : ""}
-                        </div>
-                        <div className=" pt-1 text-center text-[14px] font-semibold leading-none text-[#000000]">
-                          {webData?.date
-                            ? new Date(webData?.date).toLocaleDateString(
-                                "en-US",
-                                {
-                                  day: "2-digit",
-                                }
-                              )
-                            : ""}
-                        </div>
-                      </div>
-                      <div className="flex flex-col text-[#292D32] gap-1  text-[14px] leading-[100%] -tracking-[0.5] pr-3">
-                        <p className="font-normal">
-                          {webData?.date
-                            ? new Date(webData?.startTime).toLocaleDateString(
-                                "en-US",
-                                {
-                                  weekday: "long",
-                                }
-                              )
-                            : ""}
-                        </p>
-                        <p className="font-normal">
-                          {" "}
-                          {webData?.date
-                            ? new Date(webData?.startTime).toLocaleTimeString(
-                                "en-US",
-                                {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                  hour12: true,
-                                }
-                              )
-                            : ""}
-                        </p>
-                      </div>
+                    <div>
+                      <p className="text-[14px] font-medium text-[#000000]">
+                        {webData?.date
+                          ? new Date(webData?.date).toLocaleDateString(
+                              "en-US",
+                              {
+                                weekday: "long",
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              }
+                            )
+                          : ""}
+                      </p>
+                      <p className="text-[12px] text-[#787878] mt-1">
+                        Starts in {days} days
+                      </p>
                     </div>
                   </div>
 
-                  {/* Starts In */}
-                  <div className="">
-                    <div className="text-xs font-medium text-[#333333]">
-                      Starts In
+                  {/* Location */}
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-5 h-5 flex items-center justify-center mt-0.5">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"
+                          fill="#292D32"
+                        />
+                      </svg>
                     </div>
-                    {finished ? (
-                      <div className="mt-3 text-green-700 font-semibold">
-                        Registration is closed!
-                      </div>
-                    ) : (
-                      <div className="mt-3 flex items-center gap-[9px]">
-                        <TimeBox value={days} label="DAYS" />
-                        <span>:</span>
-                        <TimeBox value={hours} label="HRS" />
-                        <span>:</span>
-                        {/* <TimeBox value={minutes} label="MINS" /> */}
-                        <TimeBox value={seconds} label="SECS" />
-                      </div>
-                    )}
+                    <div>
+                      <p className="text-[14px] font-medium text-[#000000]">
+                        Google Meet
+                      </p>
+                      <p className="text-[12px] text-[#787878] mt-1">
+                        Online session
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Time */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 flex items-center justify-center mt-0.5">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.25 16.15L17 14.92L12.5 12.25V7Z"
+                          fill="#292D32"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-[14px] font-medium text-[#000000]">
+                        {webData?.startTime
+                          ? new Date(webData?.startTime).toLocaleTimeString(
+                              "en-US",
+                              {
+                                hour: "numeric",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
+                            )
+                          : ""}{" "}
+                        -{" "}
+                        {webData?.endTime
+                          ? new Date(webData?.endTime).toLocaleTimeString(
+                              "en-US",
+                              {
+                                hour: "numeric",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
+                            )
+                          : ""}
+                      </p>
+                      <p className="text-[12px] text-[#787878] mt-1">
+                        45 mins duration
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Register form */}
-                <form
-                  onSubmit={handleclick}
-                  className="mt-2 rounded-lg border border-[#EAEAEA] p-6 bg-[#FAFAFA] shadow-sm w-full relative"
-                >
-                  {finished && (
-                    <div className="bg-[#ffff] cursor-not-allowed bg-gradient-to-br from-white/30 to-white/50 backdrop-blur-sm opacity-[0.7] w-[100%] h-full absolute z-50 top-0 left-[0]"></div>
-                  )}
-                  <div className="grid sm:grid-cols-1 grid-cols-2 gap-4">
-                    <LabeledInput
-                      name="firstName"
-                      placeholder="Enter first name"
-                      value={formValues.firstName}
-                      onChange={handleInputChange}
-                    />
-                    <LabeledInput
-                      name="lastName"
-                      placeholder="Enter last name"
-                      value={formValues.lastName}
-                      onChange={handleInputChange}
-                    />
-                    <LabeledInput
-                      name="email"
-                      type="email"
-                      placeholder="Enter email address"
-                      value={formValues.email}
-                      onChange={handleInputChange}
-                    />
+                <div className="flex items-center justify-between">
+                  <div className="text-[24px] font-semibold text-[#000000]">
+                    {webData?.type !== "free"
+                      ? `${getCurrencySymbol(webData?.currency)}${formatPrice(
+                          webData?.amount
+                        )}`
+                      : "Free"}
                   </div>
                   <button
-                    disabled={
-                      loading ||
-                      !formValues.firstName ||
-                      !formValues.lastName ||
-                      !formValues.email ||
-                      submit
-                    }
-                    type="submit"
-                    className="mt-4 md-w-full w-auto rounded-lg bg-primary px-4 py-1.5 text-[white] font-500 text-sm leading-5 cursor-pointer shadow hover:bg-[#0d36cc] focus:outline-none"
+                    disabled={loading || submit || finished}
+                    className="rounded-lg bg-[#1453FF] px-6 py-3 text-[white] font-medium text-[14px] leading-5 cursor-pointer shadow hover:bg-[#0d36cc] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {submit ? "Registering..." : "Register"}
+                    {submit ? "Redirecting.." : "Make Payment"}
                   </button>
-                </form>
+                </div>
               </div>
             </div>
           )}

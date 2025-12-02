@@ -1,0 +1,14 @@
+const ProductDetails = ({ fullDescription }) => {
+  return (
+    <div className="border-t border-[#EAEAEA] pt-8">
+      <h2 className="text-[20px] font-semibold text-[#000000] mb-6">Details</h2>
+
+      <div
+        className="space-y-4 text-[14px] text-[#4F4F4F] leading-[160%]"
+        dangerouslySetInnerHTML={{ __html: fullDescription }}
+      />
+    </div>
+  );
+};
+
+export default ProductDetails;
