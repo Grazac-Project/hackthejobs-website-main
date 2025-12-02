@@ -1,7 +1,6 @@
 "use client";
 import {
   fincraDigitalCheckoutData,
-  getSingleDigitalProduct,
   initializeDigitalProductPayment,
 } from "@/api/authentication/auth";
 import useFincraPayment from "@/lib/fincraCheckout";
@@ -13,6 +12,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FiDownload, FiEye } from "react-icons/fi";
 import PaystackPop from "@paystack/inline-js";
+import { useRouter } from "next/navigation";
 
 const Payment = ({
   onClick,
@@ -40,6 +40,7 @@ const Payment = ({
   const [isSuccess, setIsSuccess] = useState(false);
   const { startPayment } = useFincraPayment();
   const [showCheckout, setShowCheckout] = useState(false);
+  const router = useRouter();
   // Set button label based on product type
   useEffect(() => {
     console.log("Provider in Payment component:", provider);
@@ -284,7 +285,7 @@ const Payment = ({
         </div>
       ) : (
         // 💳 Payment Modal
-        <div className="max-w-[52rem] sm:w-full h-[90%] sm:h-full mx-auto mt-10 sm:mt-0 sm:p-4 p-14 space-y-8 bg-[white] rounded-2xl sm:rounded-none fixed inset-0 z-50 overflow-y-auto ">
+        <div className="w-[1005px] px-[56px] sm:w-full h-[90%] sm:h-full mx-auto mt-10 sm:mt-0 sm:p-4 p-14 space-y-8 bg-[white] rounded-2xl sm:rounded-none fixed inset-0 z-50 overflow-y-auto ">
           <div className="flex items-center text-sm leading-[150%] font-medium text-[#292D32]">
             <button
               className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
@@ -296,55 +297,53 @@ const Payment = ({
           </div>
 
           {/* Product Details */}
-          <div>
-            <div className="flex gap-3 items-center mb-[35px] justify-between">
-              <h3 className="text-[28px] font-semibold mb-4 truncate">
+          <div className="flex gap-[16px] ">
+            <div className="border p-2 border-[#EDEDED] rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer">
+              <div
+                className="h-[479px] w-[458px] rounded-lg bg-cover bg-center"
+                style={{ backgroundImage: `url(${productThumbnail})` }}
+              />
+            </div>
+            <div className="flex flex-col w-[411px]">
+              <h3 className="text-[24px] font-semibold mb-4 truncate">
                 {productTitle || "Digital Product"}
               </h3>
-              <button
-                className="text-sm text-[#fff] bg-primary text-white px-3 py-4 w-[182px] rounded-[6.29px] font-medium truncate"
-                // onClick={handleClick}
-                onClick={handleShowCheckout}
-              >
-                {loading}
-              </button>
-            </div>
-
-            <div>
-              <div className="border p-2 border-[#EDEDED] rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer">
-                <div
-                  className="h-64 rounded-lg bg-cover bg-center"
-                  style={{ backgroundImage: `url(${productThumbnail})` }}
-                />
+              <div className="flex items-center gap-[10px] mb-[12px]">
+                <span className="text-xs bg-[#DEA8061A] text-[#DEA806] px-3 py-1 rounded-[32px] font-medium">
+                  {category || ""}
+                </span>
+                <button className="flex items-center gap-[4.87px] bg-[#3333331A] rounded-[38.96px] py-[5.37px] px-[14.61px] sxm:px-3">
+                  {accessType ? (
+                    <FiDownload className="text-[#333333]" />
+                  ) : (
+                    <FiEye className="text-[#333333]" />
+                  )}
+                  <p className="font-medium text-xs text-[#333333]">
+                    {accessType ? "Download" : "View Only"}
+                  </p>
+                </button>
               </div>
+              <hr className="border border-[#EAEAEA] " />
 
-              <div>
-                <div className="flex gap-3 items-center my-[35px]">
-                  <span className="text-xs bg-[#DEA8061A] text-[#DEA806] px-3 py-1 rounded-[32px] font-medium">
-                    {category}
-                  </span>
-                  <button className="flex items-center gap-[4.87px] bg-[#3333331A] rounded-[38.96px] py-[5.37px] px-[14.61px] sxm:px-3">
-                    {accessType ? (
-                      <FiDownload className="text-[#333333]" />
-                    ) : (
-                      <FiEye className="text-[#333333]" />
-                    )}
-                    <p className="font-medium text-xs text-[#333333]">
-                      {accessType ? "Download" : "View Only"}
-                    </p>
-                  </button>
-                  <div className="text-sm font-semibold text-primary">
-                    {productType === "paid"
-                      ? `${productCurrency === "NGN" ? "₦" : "$"}${formatPrice(
-                          productPrice
-                        )}`
-                      : "Free"}
-                  </div>
+              <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] flex flex-col items-start h-[216px]">
+                {productDescription || ""}
+                <button onClick={() => router.push(`/digital-products/${productId}`)} className="text-primary underline mt-[16px]">View more</button>
+              </div>
+              <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px]">
+                <div className="text-[18px] font-bold text-[#333333]">
+                  {productType === "paid"
+                    ? `${productCurrency === "NGN" ? "₦" : "$"}${formatPrice(
+                        productPrice
+                      )}`
+                    : "Free"}
                 </div>
-                {/* <div className="text-sm tracking-[150%] mt-4 text-[#333333]"> */}
-                <div className="text-sm tracking-[0.08em] mt-4 text-[#333333]">
-                  {productDescription || ""}
-                </div>
+                <button
+                  className="text-sm text-[#fff] bg-primary px-3 py-[10px] w-[182px] rounded-[6.29px] font-bold truncate"
+                  // onClick={handleClick}
+                  onClick={handleShowCheckout}
+                >
+                  {loading}
+                </button>
               </div>
             </div>
           </div>
