@@ -467,8 +467,9 @@ const MentorDetails = () => {
     // }
   };
 
-  const AttendWebinar = (id) => {
+  const AttendWebinar = (id, Slug, productSlug) => {
     setWebinarId(id);
+    router.push(`/${slug}/${productSlug}`)
     setShowWebModal(!showWebModal);
   };
 
@@ -1364,7 +1365,7 @@ const MentorDetails = () => {
                                     currency={webinar.currency}
                                     amount={webinar.amount}
                                     key={id}
-                                    action={() => AttendWebinar(webinar._id)}
+                                    action={() => AttendWebinar(webinar._id, webinar.slug)}
                                   />
                                 ))}
                               </div>

@@ -17,6 +17,7 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
 import PaystackPop from "@paystack/inline-js";
 import Cookies from "js-cookie";
+import Link from "next/link";
 function useCountdown(targetDate) {
   const target = useMemo(() => new Date(targetDate).getTime(), [targetDate]);
   const [timeLeft, setTimeLeft] = useState(() =>
@@ -304,8 +305,8 @@ const WebinarModal = ({ webinarId, token, provider, onClick }) => {
             <Load />
           ) : (
             <div className="flex sm:flex-wrap gap-[35px] md:gap-4 ">
-              <div className="mt-8 lg:mt-0 w-[308px] lg:w-[45%] md:w-full">
-                <div className="overflow-hidden rounded-2xl shadow-sm">
+              <div className="mt-8 lg:mt-0 w-[602px] lg:w-[45%] md:w-full rounded-xl p-2 border-[1px] border-[#EDEDED] shadow-sm">
+                <div className="overflow-hidden rounded-xl shadow-sm">
                   <img
                     src={webData?.thumbnail}
                     alt="Event poster"
@@ -317,15 +318,17 @@ const WebinarModal = ({ webinarId, token, provider, onClick }) => {
               {/* Right content */}
               <div className="flex flex-col gap-6 w-[55%] md:w-full">
                 <div className="pt-10 lg:pt-2 ">
-                  <h3 className="mb-2 font-semibold leading-[120%] text-[28px]  text-[#000000]">
+                  <h3 className="mb-2 font-semibold leading-[120%] text-[24px]  text-[#000000]">
                     {webData?.title}
                   </h3>
                   <p className="mt-3 text-[#787878] text-[14px] line-clamp-3">
                     {webData?.description}
                   </p>
-                  <button className="mt-2 text-[#1453FF] text-[14px] font-medium hover:underline">
-                    View more
-                  </button>
+                  <Link href={`/seunbayo/fghjkd`}>
+                    <button className="mt-2 text-[#1453FF] text-[14px] font-medium hover:underline">
+                      View more
+                    </button>
+                  </Link>
                 </div>
 
                 {/* Event Details Card */}
@@ -432,69 +435,7 @@ const WebinarModal = ({ webinarId, token, provider, onClick }) => {
                   </div>
                 </div>
 
-                {/* Price and Payment */}
-                <div className="mt-auto">
-                  {/* {finished && (
-                    <div className="bg-[#ffff] cursor-not-allowed bg-gradient-to-br from-white/30 to-white/50 backdrop-blur-sm opacity-[0.7] w-[100%] h-full absolute z-50 top-0 left-[0]"></div>
-                  )} */}
-
-                  {/* Registration Form - Show if user hasn't filled details */}
-                  {(!formValues.firstName ||
-                    !formValues.lastName ||
-                    !formValues.email) &&
-                    (!userFirstName || !userLastName || !userEmail) && (
-                      <form
-                        onSubmit={handleclick}
-                        className="mb-4 rounded-lg border border-[#EAEAEA] p-6 bg-[#FAFAFA] shadow-sm"
-                      >
-                        <h4 className="text-[14px] font-semibold text-[#000000] mb-4">
-                          Registration Details
-                        </h4>
-                        <div className="grid sm:grid-cols-1 grid-cols-2 gap-4">
-                          <LabeledInput
-                            name="firstName"
-                            placeholder="Enter first name"
-                            value={formValues.firstName}
-                            onChange={handleInputChange}
-                          />
-                          <LabeledInput
-                            name="lastName"
-                            placeholder="Enter last name"
-                            value={formValues.lastName}
-                            onChange={handleInputChange}
-                          />
-                          <div className="sm:col-span-1 col-span-2">
-                            <LabeledInput
-                              name="email"
-                              type="email"
-                              placeholder="Enter email address"
-                              value={formValues.email}
-                              onChange={handleInputChange}
-                            />
-                          </div>
-                        </div>
-                      </form>
-                    )}
-
-                  {/* Price and Payment Button */}
-                  <form onSubmit={handleclick}>
-                    {/* Hidden inputs for form submission */}
-                    <input
-                      type="hidden"
-                      name="firstName"
-                      value={formValues.firstName || userFirstName || ""}
-                    />
-                    <input
-                      type="hidden"
-                      name="lastName"
-                      value={formValues.lastName || userLastName || ""}
-                    />
-                    <input
-                      type="hidden"
-                      name="email"
-                      value={formValues.email || userEmail || ""}
-                    />
-                    <div className="flex items-center justify-between">
+                 <div className="flex items-center justify-between">
                       <div className="text-[24px] font-semibold text-[#000000]">
                         {webData?.type !== "free"
                           ? `${getCurrencySymbol(
@@ -506,19 +447,14 @@ const WebinarModal = ({ webinarId, token, provider, onClick }) => {
                         disabled={
                           loading ||
                           submit ||
-                          finished ||
-                          (!formValues.firstName && !userFirstName) ||
-                          (!formValues.lastName && !userLastName) ||
-                          (!formValues.email && !userEmail)
+                          finished 
                         }
                         type="submit"
                         className="rounded-lg bg-[#1453FF] px-6 py-3 text-[white] font-medium text-[14px] leading-5 cursor-pointer shadow hover:bg-[#0d36cc] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {submit ? "Processing..." : "Make Payment"}
+                        {submit ? "Redirecting.." : "Make Payment"}
                       </button>
                     </div>
-                  </form>
-                </div>
               </div>
             </div>
           )}
