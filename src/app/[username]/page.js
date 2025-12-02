@@ -157,6 +157,7 @@ const MentorDetails = () => {
   const [slot, setSlot] = useState({});
   const [loader, setLoader] = useState(false);
   const [provider, setProvider] = useState("");
+  const [link, setLink] = useState("");
   
 
   const checkboxRef = useRef(null);
@@ -467,9 +468,9 @@ const MentorDetails = () => {
     // }
   };
 
-  const AttendWebinar = (id, Slug, productSlug) => {
+  const AttendWebinar = (id, productSlug) => {
     setWebinarId(id);
-    router.push(`/${slug}/${productSlug}`)
+    setLink(`/${slug}/${productSlug}`)
     setShowWebModal(!showWebModal);
   };
 
@@ -607,6 +608,7 @@ const MentorDetails = () => {
                       webinarId={webinarId}
                       token={token}
                       provider={provider}
+                      link={link}
                     />
                   )}
 
@@ -1365,7 +1367,7 @@ const MentorDetails = () => {
                                     currency={webinar.currency}
                                     amount={webinar.amount}
                                     key={id}
-                                    action={() => AttendWebinar(webinar._id, webinar.slug)}
+                                    action={() => AttendWebinar(webinar._id, webinar?.slug)}
                                   />
                                 ))}
                               </div>

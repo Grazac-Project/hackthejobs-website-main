@@ -18,6 +18,7 @@ import { toast, ToastContainer } from "react-toastify";
 import PaystackPop from "@paystack/inline-js";
 import Cookies from "js-cookie";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 function useCountdown(targetDate) {
   const target = useMemo(() => new Date(targetDate).getTime(), [targetDate]);
   const [timeLeft, setTimeLeft] = useState(() =>
@@ -39,7 +40,7 @@ function useCountdown(targetDate) {
   return { days, hours, minutes, seconds, finished: totalSeconds === 0 };
 }
 
-const WebinarModal = ({ webinarId, token, provider, onClick }) => {
+const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
   const [webData, setWebData] = useState({});
   const [singleWebData, setSingleWebData] = useState({});
   const [loading, setLoading] = useState(false);
@@ -52,6 +53,7 @@ const WebinarModal = ({ webinarId, token, provider, onClick }) => {
     email: "",
   });
   const [error, setError] = useState(false);
+   const router = useRouter();
 
   let userId;
   let userFirstName;
@@ -93,7 +95,7 @@ const WebinarModal = ({ webinarId, token, provider, onClick }) => {
   //     document.body.style.overflow = prevBodyOverflow;
   //   };
   // }, []);
-
+console.log({link})
   const startsAt = webData?.startTime;
 
   const { days, hours, minutes, seconds, finished } = useCountdown(startsAt);
@@ -324,11 +326,13 @@ const WebinarModal = ({ webinarId, token, provider, onClick }) => {
                   <p className="mt-3 text-[#787878] text-[14px] line-clamp-3">
                     {webData?.description}
                   </p>
-                  <Link href={`/seunbayo/fghjkd`}>
-                    <button className="mt-2 text-[#1453FF] text-[14px] font-medium hover:underline">
-                      View more
-                    </button>
-                  </Link>
+
+                  <button
+                    onClick={() => router.push(link)}
+                    className="mt-2 text-[#1453FF] text-[14px] font-medium hover:underline"
+                  >
+                    View more
+                  </button>
                 </div>
 
                 {/* Event Details Card */}
@@ -435,26 +439,21 @@ const WebinarModal = ({ webinarId, token, provider, onClick }) => {
                   </div>
                 </div>
 
-                 <div className="flex items-center justify-between">
-                      <div className="text-[24px] font-semibold text-[#000000]">
-                        {webData?.type !== "free"
-                          ? `${getCurrencySymbol(
-                              webData?.currency
-                            )}${formatPrice(webData?.amount)}`
-                          : "Free"}
-                      </div>
-                      <button
-                        disabled={
-                          loading ||
-                          submit ||
-                          finished 
-                        }
-                        type="submit"
-                        className="rounded-lg bg-[#1453FF] px-6 py-3 text-[white] font-medium text-[14px] leading-5 cursor-pointer shadow hover:bg-[#0d36cc] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {submit ? "Redirecting.." : "Make Payment"}
-                      </button>
-                    </div>
+                <div className="flex items-center justify-between">
+                  <div className="text-[24px] font-semibold text-[#000000]">
+                    {webData?.type !== "free"
+                      ? `${getCurrencySymbol(webData?.currency)}${formatPrice(
+                          webData?.amount
+                        )}`
+                      : "Free"}
+                  </div>
+                  <button
+                    disabled={loading || submit || finished}
+                    className="rounded-lg bg-[#1453FF] px-6 py-3 text-[white] font-medium text-[14px] leading-5 cursor-pointer shadow hover:bg-[#0d36cc] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {submit ? "Redirecting.." : "Make Payment"}
+                  </button>
+                </div>
               </div>
             </div>
           )}
