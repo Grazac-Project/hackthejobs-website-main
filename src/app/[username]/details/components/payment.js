@@ -288,7 +288,7 @@ const Payment = ({
         </div>
       ) : (
         // 💳 Payment Modal
-        <div className="w-[1005px] px-[56px] sm:w-full h-[90%] sm:h-full mx-auto mt-10 sm:mt-0 sm:p-4 p-14 space-y-8 bg-[white] rounded-2xl sm:rounded-none fixed inset-0 z-50 overflow-y-auto ">
+        <div className="w-[1005px] px-[56px] sm:w-full h-[90%] sm:h-full mx-auto mt-10 sm:mt-0 sm:p-4 p-14 space-y-8 bg-[white] rounded-2xl sm:rounded-none fixed inset-0 z-50 overflow-y-auto lgx:w-[90%] md:w-[75%] xm:w-[90%] ">
           <div className="flex items-center text-sm leading-[150%] font-medium text-[#292D32]">
             <button
               className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
@@ -300,22 +300,22 @@ const Payment = ({
           </div>
 
           {/* Product Details */}
-          <div className="flex gap-[16px] ">
-            <div className="border p-2 border-[#EDEDED] rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer">
+          <div className="flex gap-[16px] md:flex-col">
+            <div className="border p-2 border-[#EDEDED] rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer md:w-[475px] xm:w-[100%]">
               <div
-                className="h-[479px] w-[458px] rounded-lg bg-cover bg-center"
+                className="h-[479px] w-[458px] rounded-lg bg-cover bg-center xm:w-[100%]  "
                 style={{ backgroundImage: `url(${productThumbnail})` }}
               />
             </div>
-            <div className="flex flex-col w-[411px]">
-              <h3 className="text-[24px] font-semibold mb-4 truncate">
+            <div className="flex flex-col w-[411px] xm:w-[100%]">
+              <h3 className="text-[24px] font-semibold mb-4 truncate xm:text-[20px]">
                 {productTitle || "Digital Product"}
               </h3>
               <div className="flex items-center gap-[10px] mb-[12px]">
                 <span className="text-xs bg-[#DEA8061A] text-[#DEA806] px-3 py-1 rounded-[32px] font-medium">
                   {category || ""}
                 </span>
-                <button className="flex items-center gap-[4.87px] bg-[#3333331A] rounded-[38.96px] py-[5.37px] px-[14.61px] sxm:px-3">
+                <button className="flex items-center gap-[4.87px] bg-[#3333331A] rounded-[38.96px] py-[5.37px] px-[14.61px] sxm:px-3 cursor-none">
                   {accessType ? (
                     <FiDownload className="text-[#333333]" />
                   ) : (
@@ -341,7 +341,7 @@ const Payment = ({
                     : "Free"}
                 </div>
                 <button
-                  className="text-sm text-[#fff] bg-primary px-3 py-[10px] w-[182px] rounded-[6.29px] font-bold truncate"
+                  className="text-sm text-[#fff] bg-primary px-3 py-[10px] w-[182px] xxm:w-[120px] rounded-[6.29px] font-bold truncate"
                   // onClick={handleClick}
                   onClick={handleShowCheckout}
                 >
