@@ -158,6 +158,7 @@ const MentorDetails = () => {
   const [loader, setLoader] = useState(false);
   const [provider, setProvider] = useState("");
   const [link, setLink] = useState("");
+  const [productSlug, setProductSlug] = useState("");
   
 
   const checkboxRef = useRef(null);
@@ -435,7 +436,8 @@ const MentorDetails = () => {
     description,
     thumbnail,
     category,
-    accessType
+    accessType,
+    Slug
   ) => {
     // if (token) {
     setProductId(id);
@@ -447,6 +449,7 @@ const MentorDetails = () => {
     setProductDescription(description);
     setCategory('Digital Product');
     setAccessType(accessType);
+    setProductSlug(Slug)
     // console.log({ id });
     setShowModal(true);
     // }
@@ -562,6 +565,8 @@ const MentorDetails = () => {
                       successPaymentModal={() => setSuccessPaymentModal(true)}
                       makeFree={() => setFreeMode(true)}
                       provider={provider}
+                      productSlug={productSlug}
+                      expertSlug= {slug}
                     />
                   )}
                   {showBookingModal && (
@@ -1123,7 +1128,8 @@ const MentorDetails = () => {
                                         book?.description,
                                         book?.thumbnail,
                                         book?.category,
-                                        book?.accessType
+                                        book?.accessType,
+                                        book?.slug
                                       )
                                     }
                                   >

@@ -34,6 +34,8 @@ const Payment = ({
   successPaymentModal,
   makeFree,
   provider,
+  productSlug,
+  expertSlug
 }) => {
   const [loading, setLoading] = useState("Access Product");
   const [freeMode, setFreeMode] = useState(false);
@@ -42,6 +44,7 @@ const Payment = ({
   const [showCheckout, setShowCheckout] = useState(false);
   const router = useRouter();
   // Set button label based on product type
+  console.log({productSlug})
   useEffect(() => {
     console.log("Provider in Payment component:", provider);
     if (productType === "paid") setLoading("Make Payment");
@@ -327,7 +330,7 @@ const Payment = ({
 
               <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] flex flex-col items-start h-[216px]">
                 {productDescription || ""}
-                <button onClick={() => router.push(`/digital-products/${productId}`)} className="text-primary underline mt-[16px]">View more</button>
+                <button onClick={() => router.push(`/${expertSlug}/${productSlug}`)} className="text-primary underline mt-[16px]">View more</button>
               </div>
               <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px]">
                 <div className="text-[18px] font-bold text-[#333333]">
