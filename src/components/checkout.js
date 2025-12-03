@@ -96,7 +96,7 @@ const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, produ
           </div>
           <div>
             <h2 className="font-normal text-[14px] text-[#101828] leading-[180%] tracking-[0] mb-2">
-             {category.toLowerCase() === "webinar" ? "Webinar title" : "Product name"}
+             {category?.toLowerCase() === "webinar" ? "Webinar title" : "Product name"}
             </h2>
             <p className="font-bold text-[16px] text-[#292D32] leading-[22px]">
               {productDescription}
