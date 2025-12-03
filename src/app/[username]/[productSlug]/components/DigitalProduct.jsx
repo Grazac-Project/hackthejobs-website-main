@@ -10,7 +10,12 @@ import { FiDownload, FiEye } from "react-icons/fi";
 import PaystackPop from "@paystack/inline-js";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { fincraDigitalCheckoutData, fincraWebinarCheckoutData, getProductBySlug, initializeDigitalProductPayment } from "@/api/authentication/auth";
+import {
+  fincraDigitalCheckoutData,
+  fincraWebinarCheckoutData,
+  getProductBySlug,
+  initializeDigitalProductPayment,
+} from "@/api/authentication/auth";
 import { Load } from "@/components/loading";
 import Checkout from "@/components/checkout";
 
@@ -57,11 +62,12 @@ const DigitalProduct = () => {
           let mappedData;
           console.log(apiData, "apiData");
           setProduct(apiData);
+          setProductData(apiData); // Fix: Set productData so it's available for payment
         } else {
           setError("Product not found");
         }
       } catch (err) {
-        console.log(err)
+        console.log(err);
         console.error("Error fetching product:", err);
         setError(
           err.response?.data?.message ||
@@ -78,99 +84,137 @@ const DigitalProduct = () => {
   }, [username, productSlug]);
 
   const handleAccessProduct = (z) => {
-    let productId = product?.id;
+    let productId = product?._id || product?.id;
+    console.log("handleAccessProduct initiated with:", z);
+    console.log("Product ID:", productId);
+
     try {
       setLoading("Initiating access ...");
       const data = { productId, ...z };
+      console.log("Calling initializeDigitalProductPayment with:", data);
 
       initializeDigitalProductPayment(data)
         .then((res) => {
+          console.log("initializeDigitalProductPayment success:", res);
           setLoading(false);
           setCheckout(false);
-          setIsSuccess(true);
-          setFreeMode(true);
+          // setIsSuccess(true);
           setMain(true);
-    
+
           // setIsSuccess(true);
           // successModal();
           successPaymentModal();
-          makeFree();
+          // makeFree(); // Check if this function exists or is needed
         })
         .catch((err) => {
-          // console.log(err);
+          console.error("initializeDigitalProductPayment error:", err);
           setLoading(false);
           setMain(true);
-    
+
           toast.error(err.response?.data?.message || "Something went wrong");
           setLoading("Access Product");
         });
     } catch (err) {
-      console.log(err)
+      console.error("handleAccessProduct exception:", err);
       // console.error(err);
       setLoading("Access Product");
     }
   };
- const handlePayment = async (values) => {
+  const handlePayment = async (values) => {
+    console.log("handlePayment initiated with values:", values);
+    console.log("Product Data:", productData);
+    console.log("Provider:", provider);
+
     try {
       const data = {
-        webinarId: productData?._id,
+        productId: productData?._id,
         firstName: values.firstName,
         lastName: values.lastName,
         email: values.email,
         currency: productData?.currency,
+        amount: productData?.amount, // Ensure amount is passed
       };
-      setLoading(true);
+      setLoading(true); // User preferred full screen loader
       let reference;
 
       try {
+        console.log("Calling fincraDigitalCheckoutData with:", data);
+        // Reverting to fincraDigitalCheckoutData as this is DigitalProduct.jsx
         const res = await fincraDigitalCheckoutData(data, token);
+        console.log("fincraDigitalCheckoutData response:", res);
+
         if (provider === "paystack") {
-          console.log(res?.data?.data?.paystack);
-          console.log("Payment via Paystack selected");
-          console.log(
-            "Payment Data:",
-            res?.data?.data?.data?.paystack?.access_code
-          );
+          console.log("Payment provider is Paystack");
+          console.log("Paystack Data:", res?.data?.data?.paystack);
 
           const accessCode = res?.data?.data?.data?.paystack?.access_code;
+          console.log("Paystack Access Code:", accessCode);
 
           if (accessCode) {
-            console.log("Paystack Access Code.......:", accessCode);
             const popup = new PaystackPop();
             popup.resumeTransaction(accessCode, {
               onCancel: () => {
-                console.log("this is being cancelled...");
+                console.log("Paystack transaction cancelled");
+                setLoading(false);
               },
-              onError: () => {
-                console.log(" error");
+              onError: (error) => {
+                console.log("Paystack transaction error:", error);
+                setLoading(false);
+                toast.error("Payment failed. Please try again.");
               },
               onLoad: () => {
-                console.log("this is being loaded..");
+                console.log("Paystack widget loaded");
               },
               onSuccess: () => {
+                console.log("Paystack transaction successful");
                 setMain(true);
-                setShowModal(false);
                 setCheckout(false);
                 setLoading(false);
-                // setIsSuccess(true);
                 successPaymentModal();
-                setLoading("Make Payment");
               },
             });
             return;
+          } else {
+            console.error("No access code found for Paystack");
+            toast.error("Could not initialize Paystack payment.");
+            setLoading(false);
+            return;
           }
         }
+
         reference = res.data?.data?.payment?.reference;
+        console.log("Fincra Reference:", reference);
+
+        if (!reference) {
+          console.error("No reference returned from API for Fincra");
+          console.log("Full Response Data:", res.data?.data);
+        }
       } catch (err) {
-        console.log(err);
+        console.error("Error in checkout data call:", err);
         toast.error(
-          err.response?.data?.message || "An error occurred. Please try again."
+          err.response?.data?.message ||
+            "An error occurred initializing payment."
         );
         setLoading(false);
         return;
       }
 
+      if (!reference && provider !== "paystack") {
+        console.error("Cannot proceed with Fincra payment without reference");
+        toast.error("Payment initialization failed. No reference.");
+        setLoading(false);
+        return;
+      }
+
       const fullname = `${values.firstName} ${values.lastName}`;
+      console.log("Starting Fincra payment with:", {
+        price: productData?.amount,
+        currency: productData?.currency,
+        ref: reference,
+        nameProp: fullname,
+        emailProp: values.email,
+      });
+
       const result = await startPayment({
         price: productData?.amount,
         currency: productData?.currency,
@@ -178,6 +222,7 @@ const DigitalProduct = () => {
         nameProp: fullname,
         emailProp: values.email,
         onSuccess: (data) => {
+          console.log("Fincra payment success:", data);
           setSuccess(true);
           setCheckout(false);
           const url = new URL(window.location.href);
@@ -185,32 +230,43 @@ const DigitalProduct = () => {
           window.history.replaceState({}, "", url.toString());
         },
         onClose: () => {
-          toast.error("Transaction was not completed, window closed.");
+          console.log("Fincra modal closed");
+          toast.info("Payment window closed.");
           setLoading(false);
         },
       });
     } catch (err) {
-      console.error(err);
+      console.error("Error in handlePayment:", err);
+      toast.error("An unexpected error occurred.");
       setLoading(false);
     }
   };
   const handleForeignPayment = async (values) => {
+    console.log("handleForeignPayment initiated with:", values);
     const data = {
-      webinarId: productData?._id,
+      productId: productData?._id,
       firstName: values?.firstName,
       lastName: values?.lastName,
       email: values?.email,
       currency: productData?.currency,
     };
+    console.log("Foreign payment data:", data);
     setLoading(true);
     fincraDigitalCheckoutData(data, token)
       .then((res) => {
+        console.log("fincraDigitalCheckoutData success:", res);
         setLoading(false);
         const url = res.data.data.redirectUrl;
-        window.location.href = url;
+        if (url) {
+          console.log("Redirecting to:", url);
+          window.location.href = url;
+        } else {
+          console.error("No redirect URL found in response");
+          toast.error("Failed to initiate foreign payment.");
+        }
       })
       .catch((err) => {
-        console.log(err);
+        console.error("fincraDigitalCheckoutData error:", err);
         toast.error(err.response?.data?.message || "Something went wrong");
         setLoading(false);
       });
@@ -238,17 +294,15 @@ const DigitalProduct = () => {
     }
   };
 
+  // if (loader) {
+  //   return (
+  //     <div className="min-h-screen bg-[#F2F2F7] flex items-center justify-center">
+  //       <Load />
+  //     </div>
+  //   );
+  // }
 
-
-  if (loader) {
-    return (
-      <div className="min-h-screen bg-[#F2F2F7] flex items-center justify-center">
-        <Load />
-      </div>
-    );
-  }
-
-  if (error || !product) {
+  if (error) {
     return (
       <div className="min-h-screen bg-[#F2F2F7] flex items-center justify-center">
         <div className="text-center">
@@ -260,7 +314,7 @@ const DigitalProduct = () => {
   return (
     <div className="bg-[#F2F2F7] font-satoshi">
       <Link href="/">
-        <div className="bg-[#ffff] pt-[61px] pb-[23px] rounded-md px-[80px]">
+        <div className="bg-[#ffff] rounded-md py-6 px-6">
           <Image
             src="/prooval-logo.svg"
             width={100.44}
@@ -269,101 +323,108 @@ const DigitalProduct = () => {
           />
         </div>
       </Link>
-      <div className="mx-[169px] mt-[40px]">
-        <div className="bg-[#fff] px-[56px] py-[24px] rounded-2xl">
-          <div className="flex items-center text-sm leading-[150%] font-medium text-[#292D32] pb-[35px]">
-            <button
-              className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
-              // onClick={onClick}
-            >
-              <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
-            </button>
-            <span className="text-2xl font-semibold ml-4">Back</span>
-          </div>
-
-          {/* Product Details */}
-          <div className="flex gap-[16px] ">
-            <div className="border p-2 border-[#EDEDED] rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer">
-              <div
-                className="h-[479px] w-[458px] rounded-lg bg-cover bg-center"
-                style={{ backgroundImage: `url(${product?.thumbnail})` }}
-              />
+      {main && (
+        <div className="mx-[169px] mt-[40px]">
+          <div className="bg-[#fff] px-[56px] py-[24px] rounded-2xl">
+            <div className="flex items-center text-sm leading-[150%] font-medium text-[#292D32] pb-[35px]">
+              <button
+                className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
+                onClick={() => router.back()}
+              >
+                <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
+              </button>
+              <span className="text-2xl font-semibold ml-4">Back</span>
             </div>
-            <div className="flex flex-col w-[411px]">
-              <h3 className="text-[24px] font-semibold mb-4 truncate">
-                {product?.title || "Digital Product"}
-              </h3>
-              <div className="flex items-center gap-[10px] mb-[12px]">
-                <span className="text-xs bg-[#DEA8061A] text-[#DEA806] px-3 py-1 rounded-[32px] font-medium">
-                  {product?.category || ""}
-                </span>
-                <button className="flex items-center gap-[4.87px] bg-[#3333331A] rounded-[38.96px] py-[5.37px] px-[14.61px] sxm:px-3">
-                  {product?.accessType ? (
-                    <FiDownload className="text-[#333333]" />
-                  ) : (
-                    <FiEye className="text-[#333333]" />
-                  )}
-                  <p className="font-medium text-xs text-[#333333]">
-                    {product?.accessType ? "Download" : "View Only"}
-                  </p>
-                </button>
-              </div>
-              <hr className="border border-[#EAEAEA] " />
 
-              <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] flex flex-col items-start h-[216px]">
-                {product?.description || ""}
-                {/* <button
+            {/* Product Details */}
+            <div className="flex gap-[16px] ">
+              <div className="border p-2 border-[#EDEDED] rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer">
+                <div
+                  className="h-[479px] w-[458px] rounded-lg bg-cover bg-center"
+                  style={{ backgroundImage: `url(${product?.thumbnail})` }}
+                />
+              </div>
+              <div className="flex flex-col w-[411px]">
+                <h3 className="text-[24px] font-semibold mb-4 truncate">
+                  {product?.title || "Digital Product"}
+                </h3>
+                <div className="flex items-center gap-[10px] mb-[12px]">
+                  <span className="text-xs bg-[#DEA8061A] text-[#DEA806] px-3 py-1 rounded-[32px] font-medium">
+                    {product?.category || ""}
+                  </span>
+                  <button className="flex items-center gap-[4.87px] bg-[#3333331A] rounded-[38.96px] py-[5.37px] px-[14.61px] sxm:px-3">
+                    {product?.accessType ? (
+                      <FiDownload className="text-[#333333]" />
+                    ) : (
+                      <FiEye className="text-[#333333]" />
+                    )}
+                    <p className="font-medium text-xs text-[#333333]">
+                      {product?.accessType ? "Download" : "View Only"}
+                    </p>
+                  </button>
+                </div>
+                <hr className="border border-[#EAEAEA] " />
+
+                <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] flex flex-col items-start h-[216px]">
+                  {product?.description || ""}
+                  {/* <button
                   onClick={() => router.push(``)}
                   className="text-primary underline mt-[16px]"
                 >
                   View more
                 </button> */}
-              </div>
-              <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px]">
-                <div className="text-[18px] font-bold text-[#333333]">
-                  {product?.type === "paid"
-                    ? `${product.currency === "NGN" ? "₦" : "$"}${formatPrice(
-                        product?.amount
-                      )}`
-                    : "Free"}
                 </div>
-                <button
-                  className="text-sm text-[#fff] bg-primary px-3 py-[10px] w-[182px] rounded-[6.29px] font-bold truncate"
-                  // onClick={handleClick}
-                  onClick={openCheckout}
-                >
-                  {product?.type === "paid" ? "Make Payment" : "Access Now"}
-                </button>
+                <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px]">
+                  <div className="text-[18px] font-bold text-[#333333]">
+                    {product?.type === "paid"
+                      ? `${product.currency === "NGN" ? "₦" : "$"}${formatPrice(
+                          product?.amount
+                        )}`
+                      : "Free"}
+                  </div>
+                  <button
+                    className="text-sm text-[#fff] bg-primary px-3 py-[10px] w-[182px] rounded-[6.29px] font-bold truncate"
+                    // onClick={handleClick}
+                    onClick={openCheckout}
+                  >
+                    {loading
+                      ? "Processing..."
+                      : product?.type === "paid"
+                      ? "Make Payment"
+                      : "Access Now"}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="bg-[#fff] mt-[10px] px-[56px] pt-[40px] rounded-2xl">
-          <div>
-            <p>
-              fhlsdajflkshfljdhsfajfasdjlfhlasirhiluthrleuiLorem ipsum dolor sit
-              amet consectetur. Eget egestas nulla aliquet eget sit risus
-              ullamcorper. Fermentum egestas aliquet morbi volutpat. Ultricies
-              sapien suspendisse facilisi ultrices porta vestibulum. Condimentum
-              amet ridiculus a dolor. Co nvallis tortor venenatis elementum amet
-              arcu euismod dis at. At massa etiam morbi donec enim euismod. Nec
-              lectus leo montes sit tempor suspendisse odio. Adipiscing a nunc
-              ut volutpat sapien pharetra at. In sapien sed facilisis nunc sed
-              feugiat eu dignissim. Quam sit velit a massa aliquam viverra. Nec
-              tortor in metus faucibus Lorem ipsum dolor sit amet consectetur.
-              Eget egestas nulla aliquet eget sit risus ullamcorper. Fermentum
-              egestas aliquet morbi volutpat. Ultricies sapien suspendisse
-              facilisi ultrices porta vestibulum. Condimentum amet ridiculus a
-              dolor.{" "}
-            </p>
+          <div className="bg-[#fff] mt-[10px] px-[56px] pt-[40px] rounded-2xl">
+            <div>
+              <p>
+                fhlsdajflkshfljdhsfajfasdjlfhlasirhiluthrleuiLorem ipsum dolor
+                sit amet consectetur. Eget egestas nulla aliquet eget sit risus
+                ullamcorper. Fermentum egestas aliquet morbi volutpat. Ultricies
+                sapien suspendisse facilisi ultrices porta vestibulum.
+                Condimentum amet ridiculus a dolor. Co nvallis tortor venenatis
+                elementum amet arcu euismod dis at. At massa etiam morbi donec
+                enim euismod. Nec lectus leo montes sit tempor suspendisse odio.
+                Adipiscing a nunc ut volutpat sapien pharetra at. In sapien sed
+                facilisis nunc sed feugiat eu dignissim. Quam sit velit a massa
+                aliquam viverra. Nec tortor in metus faucibus Lorem ipsum dolor
+                sit amet consectetur. Eget egestas nulla aliquet eget sit risus
+                ullamcorper. Fermentum egestas aliquet morbi volutpat. Ultricies
+                sapien suspendisse facilisi ultrices porta vestibulum.
+                Condimentum amet ridiculus a dolor.{" "}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
       {checkout && product && (
         <Checkout
           setLoader={setLoading}
-          loader={loader}
+          loader={loading}
           goBack={exitCheckout}
           checkoutCallback={checkoutCallback}
           productId={productSlug}
