@@ -56,7 +56,7 @@ const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, produ
   return (
     <div className="min-h-[100vh] py-[80px] xm:py-0 flex justify-center items-center font-satoshi bg-[url(/auth-bg.png)] bg-cover xm:bg-[#fff]">
       <div className="w-[538px] max-w-full xm:min-h-[100vh] bg-[#fff] p-8 sm:p-[16px] rounded-[8px]">
-        <div className="mb-8 xm:mb-[40px]">
+        <div className="mb-8 xm:mb-[40px] xm:hidden 3xl:block">
           <Image
             src="/prooval-logo.svg"
             width={101}

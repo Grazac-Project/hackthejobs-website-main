@@ -26,6 +26,7 @@ const DigitalProduct = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [seller, setSeller] = useState(null);
   const [provider, setProvider] = useState("");
   const [productData, setProductData] = useState(null);
   const [checkout, setCheckout] = useState(false);
@@ -63,10 +64,13 @@ const DigitalProduct = () => {
 
         if (response.data && response.data.data && response.data.data.data) {
           const apiData = response.data.data.data;
+          const seller = response.data.data?.mentor;
           const productType = response.data.data.type; // "booking" or "webinar"
           setProvider(response.data.data?.provider);
           let mappedData;
-          console.log(apiData, "apiData");
+          // console.log("FULL RESPONSE:", response);
+          // console.log(apiData, "apiData");
+          setSeller(seller);
           setProduct(apiData);
           setProductData(apiData); // Fix: Set productData so it's available for payment
         } else {
@@ -332,7 +336,21 @@ const DigitalProduct = () => {
       {main && (
         <div className="mx-[169px] mt-[40px] lgx:mx-[100px] md:mx-[40px] xm:mx-[16px]">
           <div className="bg-[#fff] px-[56px] py-[24px] rounded-2xl lgx:px-[32px] xm:px-3">
-            <div className="flex items-center text-sm leading-[150%] font-medium text-[#292D32] pb-[35px]">
+            <div
+              onClick={() => router.push(`/${username}`)}
+              className="flex items-center gap-[12px] text-[16px] font-medium text-[#101828] py-[13px] px-[8px] rounded-[8px] bg-[#FAFAFA] w-[210px] whitespace-nowrap cursor-pointer mb-[35px] border border-[#EDEDED] sm:hidden truncate"
+            >
+              <Image
+                src={product?.profilePic}
+                alt="profilepics"
+                width={32}
+                height={32}
+              />
+              <p>
+                {seller?.firstName} {seller?.lastName}
+              </p>
+            </div>
+            <div className="flex items-center text-sm leading-[150%] font-medium text-[#292D32] mb-[35px] sm:block 3xl:hidden">
               <button
                 className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
                 onClick={() => router.back()}
@@ -343,14 +361,14 @@ const DigitalProduct = () => {
             </div>
 
             {/* Product Details */}
-            <div className="flex gap-[16px] xm:flex-col  ">
+            <div className="flex gap-[16px] xm:flex-col lg:flex-col md:flex-col  ">
               <div className="border p-2 border-[#EDEDED] rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer">
                 <div
-                  className="h-[479px] w-[458px] rounded-lg bg-cover bg-center lgx:w-[411px] md:w-[100%]"
+                  className="h-[479px] w-[458px] rounded-lg bg-cover bg-center lgx:w-[411px] md:w-[100%] lg:w-full"
                   style={{ backgroundImage: `url(${product?.thumbnail})` }}
                 />
               </div>
-              <div className="flex flex-col w-[516px] lgx:w-[411px] md:w-[100%]">
+              <div className="flex flex-col w-[516px] lgx:w-[411px] md:w-[100%] lg:w-full">
                 <h3 className="text-[24px] font-semibold mb-4 truncate xm:text-[20px] xm:font-bold sxm:text-[16px] ">
                   {product?.title || "Digital Product"}
                 </h3>
@@ -373,7 +391,6 @@ const DigitalProduct = () => {
 
                 <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] h-[216px]">
                   {product?.description || ""}
-                  
                 </div>
                 <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">
                   <div className="text-[18px] font-bold text-[#333333]">
