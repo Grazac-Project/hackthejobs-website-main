@@ -446,9 +446,9 @@ const DigitalProduct = () => {
             </div>
           </div>
 
-          <div className="font-satoshi minmd:flex-row minmd:justify-between minmd:items-center text-center  flex flex-col justify-center px-[56px] py-[32px] md:px-[32px] ">
+          <div className="font-satoshi minmd:flex-row minmd:justify-between minmd:items-center text-center  flex flex-col justify-center px-[56px] py-[32px] md:px-[32px] sm:mb-[70px] ">
             <div className="flex items-center gap-1 sm:pb-[10px] sm:justify-center">
-              <p className="minmd:mb-0   text-[20px] uppercase text-[#878787]">
+              <p className="minmd:mb-0 text-[20px] uppercase text-[#878787]">
                 Powered by
               </p>
               <img
