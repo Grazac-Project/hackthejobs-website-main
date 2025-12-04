@@ -244,10 +244,7 @@ export const getBookings = (mentorId) => {
 };
 
 export const getSingleDigitalProduct = (Id, token) => {
-  return authKit.get(
-    `api/v1/mentors/digital-products/${Id}`,
-    {},
-    {
+  return authKit.get(`api/v1/mentors/digital-products/${Id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
