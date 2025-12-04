@@ -12,7 +12,6 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   fincraDigitalCheckoutData,
-  fincraWebinarCheckoutData,
   getProductBySlug,
   initializeDigitalProductPayment,
 } from "@/api/authentication/auth";
@@ -34,6 +33,7 @@ const DigitalProduct = () => {
   const [submit, setSubmit] = useState(false);
   const { startPayment } = useFincraPayment();
   const [success, setSuccess] = useState(false);
+  const [freeMode, setFreeMode] = useState(false);
   const [token, setToken] = useState("");
   const [main, setMain] = useState(true);
 
@@ -42,6 +42,7 @@ const DigitalProduct = () => {
     isProduction === "development"
       ? "https://test-dashboard.hackthejobs.com"
       : "https://dashboard.hackthejobs.com";
+
   const openCheckout = () => {
     setMain(false);
     setCheckout(true);
@@ -93,43 +94,38 @@ const DigitalProduct = () => {
     }
   }, [username, productSlug]);
 
-  const handleAccessProduct = (z) => {
-    let productId = product?._id || product?.id;
-    console.log("handleAccessProduct initiated with:", z);
-    console.log("Product ID:", productId);
+  const handleAccessProduct = async (values) => {
+  try {
+    setLoading(true);
 
-    try {
-      setLoading("Initiating access ...");
-      const data = { productId, ...z };
-      console.log("Calling initializeDigitalProductPayment with:", data);
+    const payload = {
+      productId: productData?._id,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      currency: productData?.currency || "NGN",
+    };
 
-      initializeDigitalProductPayment(data)
-        .then((res) => {
-          console.log("initializeDigitalProductPayment success:", res);
-          setLoading(false);
-          setCheckout(false);
-          // setIsSuccess(true);
-          setMain(true);
+    console.log("Free Product Payload:", payload);
 
-          // setIsSuccess(true);
-          // successModal();
-          successPaymentModal();
-          // makeFree(); // Check if this function exists or is needed
-        })
-        .catch((err) => {
-          console.error("initializeDigitalProductPayment error:", err);
-          setLoading(false);
-          setMain(true);
+    const res = await initializeDigitalProductPayment(payload, token);
 
-          toast.error(err.response?.data?.message || "Something went wrong");
-          setLoading("Access Product");
-        });
-    } catch (err) {
-      console.error("handleAccessProduct exception:", err);
-      // console.error(err);
-      setLoading("Access Product");
-    }
-  };
+    console.log("Free Product Response:", res.data);
+
+    setLoading(false);
+    setSuccess(true)
+    setFreeMode(true)
+    // successPaymentModal();
+    setCheckout(false);
+    setMain(true);
+
+  } catch (error) {
+    console.log("initializeDigitalProductPayment error:", error);
+    toast.error(error?.response?.data?.message || "Failed to process free product");
+    setLoading(false);
+  }
+};
+
   const handlePayment = async (values) => {
     console.log("handlePayment initiated with values:", values);
     console.log("Product Data:", productData);
@@ -180,7 +176,8 @@ const DigitalProduct = () => {
                 setMain(true);
                 setCheckout(false);
                 setLoading(false);
-                successPaymentModal();
+                setSuccess(true)
+                // successPaymentModal();
               },
             });
             return;
@@ -304,13 +301,14 @@ const DigitalProduct = () => {
     }
   };
 
-  // if (loader) {
-  //   return (
-  //     <div className="min-h-screen bg-[#F2F2F7] flex items-center justify-center">
-  //       <Load />
-  //     </div>
-  //   );
-  // }
+    const handleClose = () => {
+    const isProduction = process.env.NEXT_PUBLIC_DOMAIN_DEV;
+
+    window.location.href =
+      isProduction === "development"
+        ? `${process.env.NEXT_PUBLIC_STAGING_DASH_URL}/digital-products`
+        : `${process.env.NEXT_PUBLIC_DASH_URL}/digital-products`;
+  };
 
   if (error) {
     return (
@@ -321,8 +319,29 @@ const DigitalProduct = () => {
       </div>
     );
   }
+  
   return (
     <div className="bg-[#F2F2F7] font-satoshi">
+      {success && (
+          //  Success Modal
+          <div className="bg-[#fff] w-[447px] h-[291px] md:max-w-full p-8 sm:p-6 pb-[277px] sm:pb-[41px] flex flex-col items-center text-center rounded-[8px] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+            <Image src="/sucess.svg" width={57} height={57} alt="success" />
+            <h3 className="font-medium text-[24px] text-[#121927] leading-[11.71px] py-[16px]">
+              {freeMode ? "You’re all set!" : "Purchase successful"}
+            </h3>
+            <p className="font-regular text-[16px] text-[#555555] leading-[24px] mb-[20px]">
+              {freeMode
+                ? `${product.title} has been added to your dashboard. You can access it anytime`
+                : "You can now access your purchase"}
+            </p>
+            <button
+              className="min-w-[76px] h-[44px] rounded-[8px] border-[1px] px-[20px] py-[12px] font-medium bg-[#1453FF] text-[14px] text-[#fff] leading-[19.6px] tracking-[2%] mx-auto"
+              onClick={handleClose}
+            >
+              View Product
+            </button>
+          </div>
+  )}
       <Link href="/">
         <div className="bg-[#ffff] rounded-md py-6 px-[80px] md:px-[40px] xm:px-[16px]">
           <Image
@@ -333,7 +352,7 @@ const DigitalProduct = () => {
           />
         </div>
       </Link>
-      {main && (
+      {main && !success && (
         <div className="mx-[169px] mt-[40px] lgx:mx-[100px] md:mx-[40px] xm:mx-[16px]">
           <div className="bg-[#fff] px-[56px] py-[24px] rounded-2xl lgx:px-[32px] xm:px-3">
             <div
@@ -405,11 +424,7 @@ const DigitalProduct = () => {
                     // onClick={handleClick}
                     onClick={openCheckout}
                   >
-                    {loading
-                      ? "Processing..."
-                      : product?.type === "paid"
-                      ? "Make Payment"
-                      : "Access Now"}
+                    {product?.type === "paid" ? "Make Payment" : "Access Now"}
                   </button>
                 </div>
               </div>
