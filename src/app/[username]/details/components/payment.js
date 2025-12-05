@@ -43,8 +43,16 @@ const Payment = ({
   const { startPayment } = useFincraPayment();
   const [showCheckout, setShowCheckout] = useState(false);
   const router = useRouter();
+  
+  useEffect(() => {
+  // Prefetch product details page so routing is instant
+  if (expertSlug && productSlug) {
+    router.prefetch(`/${expertSlug}/${productSlug}`);
+  }
+}, [expertSlug, productSlug]);
+
   // Set button label based on product type
-  console.log({productSlug})
+  console.log({ productSlug })
   useEffect(() => {
     console.log("Provider in Payment component:", provider);
     if (productType === "paid") setLoading("Make Payment");
@@ -288,7 +296,7 @@ const Payment = ({
         </div>
       ) : (
         // 💳 Payment Modal
-        <div className="w-[1005px] px-[56px] sm:w-full h-[90%] sm:h-[90%] mx-auto mt-10 sm:mt-5 sm:p-4 p-14 space-y-8 bg-[white] rounded-2xl sm:rounded-none fixed inset-0 z-50 overflow-y-auto lgx:w-[90%] md:w-[75%] xm:w-[100%]  ">
+        <div className="w-[1005px] px-[56px] sm:w-full h-[90%] sm:h-[90%] mx-auto mt-10 sm:mt-5 sm:p-4 p-14 space-y-8 bg-[white] rounded-2xl sm:rounded-none fixed inset-0 z-50 overflow-y-auto lgx:w-[90%] md:w-[75%] xm:w-[100%] ">
           <div className="flex items-center text-sm leading-[150%] font-medium text-[#292D32]">
             <button
               className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
@@ -330,14 +338,20 @@ const Payment = ({
 
               <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] flex flex-col items-start h-[216px]">
                 {productDescription || ""}
-                <button onClick={() => router.push(`/${expertSlug}/${productSlug}`)} className="text-primary underline mt-[16px]">View more</button>
+                <button
+                  onClick={() => {router.push(`/${expertSlug}/${productSlug}`)}}
+                  className="text-primary underline mt-[16px]"
+                >
+                  View more
+                </button>
+
               </div>
               <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">
                 <div className="text-[18px] font-bold text-[#333333]">
                   {productType === "paid"
                     ? `${productCurrency === "NGN" ? "₦" : "$"}${formatPrice(
-                        productPrice
-                      )}`
+                      productPrice
+                    )}`
                     : "Free"}
                 </div>
                 <button

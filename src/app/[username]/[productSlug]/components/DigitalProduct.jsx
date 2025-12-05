@@ -82,7 +82,7 @@ const DigitalProduct = () => {
         console.error("Error fetching product:", err);
         setError(
           err.response?.data?.message ||
-            "Failed to load product. Please try again."
+          "Failed to load product. Please try again."
         );
       } finally {
         setLoading(false);
@@ -95,36 +95,36 @@ const DigitalProduct = () => {
   }, [username, productSlug]);
 
   const handleAccessProduct = async (values) => {
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const payload = {
-      productId: productData?._id,
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-      currency: productData?.currency || "NGN",
-    };
+      const payload = {
+        productId: productData?._id,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        currency: productData?.currency || "NGN",
+      };
 
-    console.log("Free Product Payload:", payload);
+      console.log("Free Product Payload:", payload);
 
-    const res = await initializeDigitalProductPayment(payload, token);
+      const res = await initializeDigitalProductPayment(payload, token);
 
-    console.log("Free Product Response:", res.data);
+      console.log("Free Product Response:", res.data);
 
-    setLoading(false);
-    setSuccess(true)
-    setFreeMode(true)
-    // successPaymentModal();
-    setCheckout(false);
-    setMain(true);
+      setLoading(false);
+      setSuccess(true)
+      setFreeMode(true)
+      // successPaymentModal();
+      setCheckout(false);
+      setMain(true);
 
-  } catch (error) {
-    console.log("initializeDigitalProductPayment error:", error);
-    toast.error(error?.response?.data?.message || "Failed to process free product");
-    setLoading(false);
-  }
-};
+    } catch (error) {
+      console.log("initializeDigitalProductPayment error:", error);
+      toast.error(error?.response?.data?.message || "Failed to process free product");
+      setLoading(false);
+    }
+  };
 
   const handlePayment = async (values) => {
     console.log("handlePayment initiated with values:", values);
@@ -200,7 +200,7 @@ const DigitalProduct = () => {
         console.error("Error in checkout data call:", err);
         toast.error(
           err.response?.data?.message ||
-            "An error occurred initializing payment."
+          "An error occurred initializing payment."
         );
         setLoading(false);
         return;
@@ -301,7 +301,7 @@ const DigitalProduct = () => {
     }
   };
 
-    const handleClose = () => {
+  const handleClose = () => {
     const isProduction = process.env.NEXT_PUBLIC_DOMAIN_DEV;
 
     window.location.href =
@@ -319,29 +319,29 @@ const DigitalProduct = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="bg-[#F2F2F7] font-satoshi">
       {success && (
-          //  Success Modal
-          <div className="bg-[#fff] w-[447px] h-[291px] md:max-w-full p-8 sm:p-6 pb-[277px] sm:pb-[41px] flex flex-col items-center text-center rounded-[8px] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
-            <Image src="/sucess.svg" width={57} height={57} alt="success" />
-            <h3 className="font-medium text-[24px] text-[#121927] leading-[11.71px] py-[16px]">
-              {freeMode ? "You’re all set!" : "Purchase successful"}
-            </h3>
-            <p className="font-regular text-[16px] text-[#555555] leading-[24px] mb-[20px]">
-              {freeMode
-                ? `${product.title} has been added to your dashboard. You can access it anytime`
-                : "You can now access your purchase"}
-            </p>
-            <button
-              className="min-w-[76px] h-[44px] rounded-[8px] border-[1px] px-[20px] py-[12px] font-medium bg-[#1453FF] text-[14px] text-[#fff] leading-[19.6px] tracking-[2%] mx-auto"
-              onClick={handleClose}
-            >
-              View Product
-            </button>
-          </div>
-  )}
+        //  Success Modal
+        <div className="bg-[#fff] w-[447px] h-[291px] md:max-w-full p-8 sm:p-6 pb-[277px] sm:pb-[41px] flex flex-col items-center text-center rounded-[8px] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+          <Image src="/sucess.svg" width={57} height={57} alt="success" />
+          <h3 className="font-medium text-[24px] text-[#121927] leading-[11.71px] py-[16px]">
+            {freeMode ? "You’re all set!" : "Purchase successful"}
+          </h3>
+          <p className="font-regular text-[16px] text-[#555555] leading-[24px] mb-[20px]">
+            {freeMode
+              ? `${product.title} has been added to your dashboard. You can access it anytime`
+              : "You can now access your purchase"}
+          </p>
+          <button
+            className="min-w-[76px] h-[44px] rounded-[8px] border-[1px] px-[20px] py-[12px] font-medium bg-[#1453FF] text-[14px] text-[#fff] leading-[19.6px] tracking-[2%] mx-auto"
+            onClick={handleClose}
+          >
+            View Product
+          </button>
+        </div>
+      )}
       <Link href="/">
         <div className="bg-[#ffff] rounded-md py-6 px-[80px] md:px-[40px] xm:px-[16px]">
           <Image
@@ -355,28 +355,38 @@ const DigitalProduct = () => {
       {main && !success && (
         <div className="mx-[169px] mt-[40px] lgx:mx-[100px] md:mx-[40px] xm:mx-[16px]">
           <div className="bg-[#fff] px-[56px] py-[24px] rounded-2xl lgx:px-[32px] xm:px-3">
-            <div
-              onClick={() => router.push(`/${username}`)}
-              className="flex items-center gap-[12px] text-[16px] font-medium text-[#101828] py-[13px] px-[8px] rounded-[8px] bg-[#FAFAFA] w-[210px] whitespace-nowrap cursor-pointer mb-[35px] border border-[#EDEDED] sm:hidden truncate"
-            >
-              <Image
-                src={product?.profilePic}
-                alt="profilepics"
-                width={32}
-                height={32}
-              />
-              <p>
-                {seller?.firstName} {seller?.lastName}
-              </p>
-            </div>
-            <div className="flex items-center text-sm leading-[150%] font-medium text-[#292D32] mb-[35px] sm:block 3xl:hidden">
-              <button
-                className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
-                onClick={() => router.back()}
+            <div className="flex items-center justify-between mb-[35px]">
+              <div
+                onClick={() => router.push(`/${username}`)}
+                className="flex items-center gap-[12px]  p-[8px] rounded-[8px] bg-[#FAFAFA] w-[210px] xm:w-[168px] whitespace-nowrap cursor-pointer border border-[#EDEDED] truncate sxm:hidden">
+                <Image
+                  src={product?.profilePic}
+                  alt="profilepics"
+                  width={32}
+                  height={32}
+                />
+                <div className="flex flex-col">
+                  <p className="text-[12px] text-[#101828] mb-[2px] font-normal">Listed by</p>
+                  <p className="text-[16px] text-[#101828] xm:text-[12px] font-medium truncate">
+                    {seller?.firstName} {seller?.lastName}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center text-sm leading-[150%] font-medium text-[#292D32] sxm:block 3xl:hidden">
+                <button
+                  className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
+                  onClick={() => router.push(`/${username}`)}
+                >
+                  <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
+                </button>
+                <span className="text-2xl font-semibold ml-2">Back</span>
+              </div>
+
+              <select
+                className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
               >
-                <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
-              </button>
-              <span className="text-2xl font-semibold ml-4">Back</span>
+              </select>
             </div>
 
             {/* Product Details */}
@@ -415,8 +425,8 @@ const DigitalProduct = () => {
                   <div className="text-[18px] font-bold text-[#333333]">
                     {product?.type === "paid"
                       ? `${product.currency === "NGN" ? "₦" : "$"}${formatPrice(
-                          product?.amount
-                        )}`
+                        product?.amount
+                      )}`
                       : "Free"}
                   </div>
                   <button
