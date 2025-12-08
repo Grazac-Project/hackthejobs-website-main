@@ -5,6 +5,7 @@ import DigitalProduct from "./components/DigitalProduct";
 import { useParams } from "next/navigation";
 import { getProductBySlug } from "@/api/authentication/auth";
 import { Load } from "@/components/loading";
+import BookingPage from "./components/bookingPage";
 
 const productPage = () => {
   const params = useParams();
@@ -55,11 +56,12 @@ if (loader) {
   }
   return (
     <div>
-      {productType.toLowerCase() === "webinar" ? (
+      <BookingPage />
+      {/* {productType.toLowerCase() === "webinar" ? (
         <WebinarPage />
       ) : (
         <DigitalProduct />
-      )}
+      )} */}
     </div>
   );
 };

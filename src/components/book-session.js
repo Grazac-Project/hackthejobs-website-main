@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter, usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import Calendar from "react-calendar";
@@ -42,7 +43,10 @@ const BookSession = ({
   setSlot,
   setLoadingState,
   provider,
+  bookingSlug,
 }) => {
+  const router = useRouter();
+  const pathname = usePathname();
   const [activeDates, setActiveDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(null);
@@ -549,10 +553,16 @@ const BookSession = ({
                 <h2 className="font-medium text-[24px] text-[#101828] leading-[25.62px]  pt-[24px] pb-[8px]">
                   {bookingData.title || "Let’s talk about negotiations"}
                 </h2>
-                <p className="font-regular text-[16px] leading-[20.8px] text-[#7D7D7D] pb-[24px]">
+                <p className="font-regular text-[16px] leading-[20.8px] text-[#7D7D7D] pb-[8px]">
                   {bookingData.description ||
                     "The booking description goes here in full with lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare."}
                 </p>
+                <button
+                  onClick={() => router.push(`${pathname}/${bookingSlug}`)}
+                  className="mb-6 text-[#1453FF] text-[14px] font-medium hover:underline"
+                >
+                  View more
+                </button>
                 <div className="flex justify-between items-center">
                   <div className=" xxm:w-fit">
                     <h3 className="font-medium text-[16px] text-[#4F4F4F] leading-[19.2px] mb-[8px]">

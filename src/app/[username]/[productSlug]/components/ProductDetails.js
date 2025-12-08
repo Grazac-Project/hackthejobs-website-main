@@ -1,7 +1,7 @@
 const ProductDetails = ({ fullDescription }) => {
   return (
-    <div className="border-t border-[#EAEAEA] pt-8">
-      <h2 className="text-[20px] font-semibold text-[#000000] mb-6">Details</h2>
+    <div className=" pt-8">
+      <h2 className="text-[20px] font-semibold text-[#000000] border-b border-[#EAEAEA] mb-6">Details</h2>
 
       <div
         className="space-y-4 text-[14px] text-[#4F4F4F] leading-[160%]"
