@@ -16,6 +16,7 @@ import {
   fincraBookingCheckoutData,
   BookingsSubmitAction,
   MentorshipPackageSubmitAction,
+  MentorshipPaidPackageAction,
 } from "@/api/authentication/auth";
 import useFincraPayment from "@/lib/fincraCheckout";
 import { ToastContainer, toast } from "react-toastify";
@@ -26,6 +27,7 @@ import Calendar from "react-calendar";
 import dayjs from "dayjs";
 import "react-calendar/dist/Calendar.css";
 import { MdKeyboardArrowRight, MdKeyboardArrowLeft } from "react-icons/md";
+import Error from "@/components/error";
 
 const BookingPage = () => {
   const params = useParams();
@@ -81,220 +83,11 @@ const BookingPage = () => {
     setMain(true);
     setSuccess(false);
   };
-  const handleRegister = async (values) => {
-    if (productData?.productType === "booking") {
-      const payload = {
-        bookingId: bookingValues?.bookingId || productData._id, // Assuming bookingID is same as productID or from slot
-        slotId: bookingValues?.slotId,
-        userId: productData?.firstName, // Or however we get mentor ID. Wait, productData doesn't have mentor ID explicitly like mentorId prop.
-        // In mappedData, firstName/lastName are there.  We might need mentor ID.
-        // In fetchProductData, response.data.data.mentor has ID?
-        // Actually, let's look at mappedData again.
-        ...values,
-        suggestion: requestNote,
-      };
-      // We lack mentorId in mappedData. I need to add it to mappedData first.
-
-      // For now, let's add logic placeholder and I will fix map separately.
-      try {
-        setLoader(true);
-        await BookingsSubmitAction(payload);
-        setSuccess(true);
-        setCheckout(false);
-        toast.success("Booking successful!");
-      } catch (err) {
-        toast.error(err.response?.data?.message || "Booking failed");
-      } finally {
-        setLoader(false);
-      }
-      return;
-    }
-
-    const payload = {
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-    };
-
-    try {
-      setLoader(true);
-      const res = await webinarReg(productData?._id, payload, token);
-
-      if (res) {
-        setSuccess(true);
-        setCheckout(false);
-        toast.success("Registration successful!");
-      }
-    } catch (err) {
-      console.error("Registration error:", err.response?.data?.message);
-      toast.error(
-        err.response?.data?.message || "Something went wrong. Please try again."
-      );
-    } finally {
-      setLoader(false);
-    }
-  };
-  const handlePayment = async (values) => {
-    try {
-      let data = {};
-      let endpoint;
-
-      if (productData?.productType === "booking") {
-        data = {
-          bookingId: bookingValues?.bookingId,
-          slotId: bookingValues?.slotId,
-          currency: productData?.currency,
-          // suggestion: requestNote,
-          ...values,
-        };
-        delete data.productId; // Checkout might pass productId, we might not need it or it might be different
-        endpoint = fincraBookingCheckoutData;
-      } else {
-        data = {
-          webinarId: productData?._id,
-          firstName: values.firstName,
-          lastName: values.lastName,
-          email: values.email,
-          currency: productData?.currency,
-        };
-        endpoint = fincraWebinarCheckoutData;
-      }
-
-      setLoader(true);
-      let reference;
-
-      try {
-        // const res = await fincraWebinarCheckoutData(data, token);
-        const res = await endpoint(data, token);
-
-        if (provider === "paystack") {
-          console.log(res?.data?.data?.paystack);
-          console.log("Payment via Paystack selected");
-          const accessCode =
-            res?.data?.data?.data?.paystack?.access_code ||
-            res?.data?.data?.paystack?.access_code; // Handle potential structure differences
-
-          if (accessCode) {
-            console.log("Paystack Access Code.......:", accessCode);
-            const popup = new PaystackPop();
-            popup.resumeTransaction(accessCode, {
-              onCancel: () => {
-                console.log("this is being cancelled...");
-              },
-              onError: () => {
-                console.log(" error");
-              },
-              onLoad: () => {
-                console.log("this is being loaded..");
-              },
-              onSuccess: () => {
-                setMain(true);
-                // setShowModal(false);
-                setCheckout(false);
-                setLoader(false);
-                // setIsSuccess(true);
-                // successPaymentModal(); // Not defined in scope?
-                setSuccess(true);
-                // setLoading("Make Payment");
-              },
-            });
-            return;
-          }
-        }
-        reference =
-          res.data?.data?.payment?.reference || res.data?.data?.reference;
-      } catch (err) {
-        console.log(err);
-        toast.error(
-          err.response?.data?.message || "An error occurred. Please try again."
-        );
-        setLoader(false);
-        return;
-      }
-
-      const fullname = `${values.firstName} ${values.lastName}`;
-      const result = await startPayment({
-        price: productData?.amount,
-        currency: productData?.currency,
-        ref: reference,
-        nameProp: fullname,
-        emailProp: values.email,
-        onSuccess: (data) => {
-          setSuccess(true);
-          setCheckout(false);
-          const url = new URL(window.location.href);
-          url.searchParams.set("ref", reference);
-          window.history.replaceState({}, "", url.toString());
-        },
-        onClose: () => {
-          toast.error("Transaction was not completed, window closed.");
-          setLoader(false);
-        },
-      });
-    } catch (err) {
-      console.error(err);
-      setLoader(false);
-    }
-  };
-  const handleForeignPayment = async (values) => {
-    let data = {};
-    let endpoint;
-
-    if (productData?.productType === "booking") {
-      data = {
-        bookingId: bookingValues?.bookingId,
-        slotId: bookingValues?.slotId,
-        amount: productData?.amount,
-        currency: productData?.currency,
-        // suggestion: requestNote,
-        ...values,
-      };
-      endpoint = fincraBookingCheckoutData;
-    } else {
-      data = {
-        webinarId: productData?._id,
-        firstName: values?.firstName,
-        lastName: values?.lastName,
-        email: values?.email,
-        currency: productData?.currency,
-      };
-      endpoint = fincraWebinarCheckoutData;
-    }
-
-    setLoader(true);
-    endpoint(data, token)
-      .then((res) => {
-        setLoader(false);
-        const url = res.data.data.checkoutUrl || res.data.data.redirectUrl; // Check which field for booking
-        window.location.href = url;
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error(err.response?.data?.message || "Something went wrong");
-        setLoader(false);
-      });
-  };
-  const checkoutCallback = async (values) => {
-    // values = { firstName, lastName, email, productId, currency }
-    console.log("Checkout callback triggered with:", values);
-
-    if (
-      productData?.type &&
-      productData?.type.toLowerCase() === "paid" &&
-      productData?.currency &&
-      productData?.currency.toUpperCase() === "NGN"
-    ) {
-      await handlePayment(values);
-    } else if (
-      productData?.type &&
-      productData?.type.toLowerCase() === "paid" &&
-      productData?.currency &&
-      productData?.currency.toUpperCase() !== "NGN"
-    ) {
-      await handleForeignPayment(values);
-    } else {
-      await handleRegister(values);
-    }
+  const currencySymbols = {
+    NGN: "₦",
+    USD: "$",
+    EUR: "€",
+    GBP: "£",
   };
 
   // Calendar Logic
@@ -373,6 +166,7 @@ const BookingPage = () => {
               location: apiData.meetLink || "Online",
               amount: apiData.amount || 0,
               currency: apiData.currency,
+              pricing: apiData.pricing || [],
               type: apiData.type, // "free" or "paid"
               category: "Webinar",
               fullDescription: apiData.description,
@@ -380,6 +174,7 @@ const BookingPage = () => {
               productType: "webinar",
               firstName: mentorData.firstName,
               lastName: mentorData.lastName,
+              mentorId: mentorData._id,
             };
           } else if (productType === "booking") {
             // Map booking response
@@ -399,6 +194,7 @@ const BookingPage = () => {
               timezone: apiData.timezone,
               amount: apiData.amount || 0,
               currency: apiData.currency,
+              pricing: apiData.pricing || [],
               type: apiData.bookingType, // "free" or "paid"
               category: "Booking",
               fullDescription: apiData.description,
@@ -409,6 +205,7 @@ const BookingPage = () => {
               firstName: mentorData.firstName,
               lastName: mentorData.lastName,
               profilePic: mentorData.profilePic,
+              mentorId: mentorData._id,
             };
           } else {
             setError("Unknown product type");
@@ -442,6 +239,319 @@ const BookingPage = () => {
     }
   }, [username, productSlug]);
 
+  /* Payment Login */
+  const handleBookingSubmit = (values) => {
+    const data = {
+      bookingId: productData._id,
+      slotId: bookingValues?._id,
+      userId: productData?.mentorId,
+      suggestion: requestNote,
+      ...values,
+    };
+
+    // Log the data being sent
+    console.log("Submitting booking with data:", data);
+
+    setLoader(true);
+    BookingsSubmitAction(data)
+      .then((res) => {
+        setLoader(false);
+        setCheckout(false);
+        setMain(true);
+        setSuccess(true);
+        toast.success("Booking successful!");
+      })
+      .catch((err) => {
+        setLoader(false);
+        setCheckout(false);
+        setMain(true);
+        toast.error(err.response?.data?.message || "Booking failed");
+      });
+  };
+
+  const handleMentorshipPackageSubmit = (values) => {
+    // Check if we have the necessary data
+    if (!productData?.mentorId) {
+      toast.error("Mentor ID is missing. Cannot proceed.");
+      return;
+    }
+
+    const data = {
+      packageId: bookingValues?.bookingId || productData._id,
+      slotId: bookingValues?.slotId,
+      userId: productData?.mentorId,
+      suggestion: requestNote,
+      ...values,
+    };
+    setLoader(true);
+    MentorshipPackageSubmitAction(data)
+      .then((res) => {
+        setLoader(false);
+        setCheckout(false);
+        setMain(true);
+        setSuccess(true);
+        toast.success("Package booked successfully!");
+      })
+      .catch((err) => {
+        setLoader(false);
+        setCheckout(false);
+        setMain(true);
+        toast.error(err.response?.data?.message || "Package booking failed");
+      });
+  };
+
+  const handleMentorshipPaidPackage = async (values) => {
+    const data = {
+      packageId: bookingValues?.bookingId || productData._id,
+      slotId: bookingValues?.slotId,
+      userId: productData?.mentorId,
+      suggestion: requestNote,
+      ...values,
+    };
+
+    try {
+      setLoader(true);
+      const res = await MentorshipPaidPackageAction(data, token);
+      const payload = res?.data?.data || {};
+      const reference = payload.reference;
+
+      const firstname =
+        payload.firstName || payload.first_name || values.firstName;
+      const lastname = payload.lastName || payload.last_name || values.lastName;
+      const fullname = `${firstname} ${lastname}`.trim();
+      const email = payload.email || payload.emailAddress || values.email;
+
+      if (productData.currency.toUpperCase() === "NGN") {
+        if (provider === "paystack") {
+          const accessCode = payload.paystack?.access_code;
+          if (accessCode) {
+            const popup = new PaystackPop();
+            popup.resumeTransaction(accessCode, {
+              onCancel: () => {
+                setLoader(false);
+              },
+              onError: () => {
+                setLoader(false);
+                toast.error("Payment Error");
+              },
+              onSuccess: () => {
+                setLoader(false);
+                setCheckout(false);
+                setMain(true);
+                setSuccess(true);
+              },
+            });
+            return;
+          }
+        }
+
+        if (reference) {
+          const url = new URL(window.location.href);
+          url.searchParams.set("ref", reference);
+          window.history.replaceState({}, "", url.toString());
+        }
+
+        await startPayment({
+          price: Number(productData.amount),
+          currency: String(productData.currency).toUpperCase(),
+          ref: reference,
+          nameProp: fullname,
+          emailProp: email,
+          onSuccess: (data) => {
+            setLoader(false);
+            setCheckout(false);
+            setMain(true);
+            setSuccess(true);
+          },
+          onClose: () => {
+            setLoader(false);
+            toast.error("Transaction was not completed, window closed.");
+          },
+        });
+      } else {
+        setLoader(false);
+        const url = payload.checkoutUrl || payload.redirectUrl;
+        if (url) window.location.href = url;
+      }
+    } catch (error) {
+      console.error(error);
+      setLoader(false);
+      setCheckout(false);
+      setMain(true);
+      toast.error(
+        error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Payment initialization failed"
+      );
+    }
+  };
+
+  const handlePayment = async (values) => {
+    // For normal bookings (not packages)
+    const data = {
+      bookingId: productData._id,
+      slotId: bookingValues?._id,
+      suggestion: requestNote,
+      currency: values?.currency || productData.currency,
+      amount: values?.amount || productData.amount,
+      ...values,
+    };
+    delete data.productId;
+
+    try {
+      setLoader(true);
+      const res = await fincraBookingCheckoutData(data, token);
+      const payload = res?.data?.data || {};
+      const reference = payload.reference;
+
+      const firstname =
+        payload.firstName || payload.first_name || values.firstName;
+      const lastname = payload.lastName || payload.last_name || values.lastName;
+      const fullname = `${firstname} ${lastname}`.trim();
+      const email = payload.email || payload.emailAddress || values.email;
+
+      if (provider === "paystack") {
+        const accessCode = payload.paystack?.access_code;
+        if (accessCode) {
+          const popup = new PaystackPop();
+          popup.resumeTransaction(accessCode, {
+            onCancel: () => setLoader(false),
+            onError: () => {
+              setLoader(false);
+              toast.error("Payment Error");
+            },
+            onSuccess: () => {
+              setLoader(false);
+              setCheckout(false);
+              setMain(true);
+              setSuccess(true);
+            },
+          });
+          return;
+        }
+      }
+
+      if (reference) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("ref", reference);
+        window.history.replaceState({}, "", url.toString());
+      }
+
+      await startPayment({
+        price: Number(values?.amount || productData.amount),
+        currency: String(
+          values?.currency || productData.currency
+        ).toUpperCase(),
+        ref: reference,
+        nameProp: fullname,
+        emailProp: email,
+        onSuccess: (data) => {
+          setLoader(false);
+          setCheckout(false);
+          setMain(true);
+          setSuccess(true);
+        },
+        onClose: () => {
+          setLoader(false);
+          toast.error("Transaction was not completed, window closed.");
+        },
+      });
+    } catch (err) {
+      console.error("Booking Payment Error:", err);
+      setLoader(false);
+      setCheckout(false);
+      setMain(true);
+      toast.error(
+        err?.response?.data?.message || "Payment initialization failed"
+      );
+    }
+  };
+
+  const handleForeignPayment = async (values) => {
+    const data = {
+      bookingId: productData._id,
+      slotId: bookingValues?._id,
+      userId: productData?.mentorId,
+      suggestion: requestNote,
+      amount: values?.amount ,
+      currency: values?.currency ,
+      ...values,
+    };
+
+    setLoader(true);
+    fincraBookingCheckoutData(data, token)
+      .then((res) => {
+        setLoader(false);
+        const url =
+          res.data.data.checkoutUrl ||
+          res.data.data.redirectUrl ||
+          res.data.data.paystack.authorization_url;
+        if (provider === "paystack") {
+          const accessCode = res.data.data?.paystack?.access_code;
+          if (accessCode) {
+            const popup = new PaystackPop();
+            popup.resumeTransaction(accessCode, {
+              onCancel: () => setLoader(false),
+              onError: () => {
+                setLoader(false);
+                toast.error("Payment Error");
+              },
+              onSuccess: () => {
+                setLoader(false);
+                setCheckout(false);
+                setMain(true);
+                setSuccess(true);
+              },
+            });
+            return;
+          }
+        }
+        if (url) window.location.href = url;
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoader(false);
+        setCheckout(false);
+        setMain(true);
+        toast.error(
+          err.response?.data?.error ||
+            err.response?.data?.message ||
+            "Foreign payment failed"
+        );
+      });
+  };
+
+  const checkoutCallback = (val) => {
+    setLoader(true);
+    if (
+      productData?.type &&
+      productData?.type.toLowerCase() === "paid" &&
+      productData?.sessionType === "mentorship"
+    ) {
+      handleMentorshipPaidPackage(val);
+    } else if (
+      productData?.type &&
+      productData?.type.toLowerCase() === "free" &&
+      productData?.sessionType === "mentorship"
+    ) {
+      handleMentorshipPackageSubmit(val);
+    } else if (
+      productData?.type &&
+      productData?.type.toLowerCase() === "paid" &&
+      productData?.currency === "NGN"
+    ) {
+      handlePayment(val);
+    } else if (
+      productData?.type &&
+      productData?.type.toLowerCase() === "paid" &&
+      productData?.currency !== "NGN"
+    ) {
+      handleForeignPayment(val);
+    } else {
+      handleBookingSubmit(val);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F2F2F7] flex items-center justify-center">
@@ -452,14 +562,11 @@ const BookingPage = () => {
 
   if (error || !productData) {
     return (
-      <div className="min-h-screen bg-[#F2F2F7] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">{error || "Product not found"}</p>
-        </div>
-      </div>
+      <>
+      <Error text={error || "Product not found"} path={`/${username}`} />
+      </>
     );
   }
-
   return (
     <div className="min-h-screen bg-[#F2F2F7]">
       <ToastContainer />
@@ -475,17 +582,6 @@ const BookingPage = () => {
       </Link>
       {main && (
         <div className="max-w-[1102px] mx-auto mt-10 mb-10 px-6">
-          {/* Back Button */}
-          {/* <div className="mb-8 flex items-center text-sm leading-[150%] font-medium text-[#292D32]">
-            <button
-              className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer hover:bg-gray-50 transition-colors"
-              onClick={() => router.back()}
-            >
-              <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
-            </button>
-            <span className="text-2xl font-semibold ml-4">Back</span>
-          </div> */}
-
           {/* Main Content Card */}
           <div className="bg-[white] rounded-2xl p-8 md:p-6 sm:p-4 shadow-sm">
             <div className="flex items-center justify-between mb-[35px]">
@@ -521,18 +617,13 @@ const BookingPage = () => {
 
               <select
                 className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
-                value={product?.currency}
+                value={productData?.currency}
                 onChange={(e) => {
                   const selectedCurrency = e.target.value;
-                  const pricingOption = product?.pricing?.find(
+                  const pricingOption = productData?.pricing?.find(
                     (p) => p.currency === selectedCurrency
                   );
                   if (pricingOption) {
-                    setProduct((prev) => ({
-                      ...prev,
-                      amount: pricingOption.amount,
-                      currency: pricingOption.currency,
-                    }));
                     setProductData((prev) => ({
                       ...prev,
                       amount: pricingOption.amount,
@@ -541,7 +632,7 @@ const BookingPage = () => {
                   }
                 }}
               >
-                {product?.pricing?.map((price) => (
+                {productData?.pricing?.map((price) => (
                   <option key={price._id} value={price.currency}>
                     {price.currency}
                   </option>
@@ -550,14 +641,14 @@ const BookingPage = () => {
             </div>
             {/* Product Hero and Info Section */}
             <h2 className="font-medium text-[24px] text-[#101828] leading-[25.62px] mb-[24px]">
-              {productData.title || "Let’s talk about negotiations"}
+              {productData.title || "-"}
             </h2>
 
             <div className="flex lg:flex-col gap-8 ">
               <div className="w-1/2 lg:w-full ">
-                <div className="flex gap-4 mb-8">
-                  <div className="bg-[#F9FAFB] rounded-lg p-3">
-                    <h3 className="text-xs text-[#4F4F4F] flex items-center gap-1 mb-1">
+                <div className="flex justify-between items-center md:flex-col gap-4 mb-[10px]">
+                  <div className="bg-[#F9FAFB] w-full flex flex-col items-start rounded-lg p-3">
+                    <h3 className="text-xs text-[#4F4F4F] flex items-start gap-1 mb-1">
                       <i>
                         <svg
                           width="16"
@@ -602,7 +693,7 @@ const BookingPage = () => {
                       {productData.timezone}
                     </p>
                   </div>
-                  <div className="bg-[#F9FAFB] rounded-lg p-3">
+                  <div className="bg-[#F9FAFB] w-full flex flex-col items-start rounded-lg p-3">
                     <h3 className="text-xs text-[#4F4F4F] flex items-center gap-1 mb-1">
                       <i>
                         <svg
@@ -634,7 +725,7 @@ const BookingPage = () => {
                       {productData.location || "Google Meet"}
                     </p>
                   </div>
-                  <div className="bg-[#F9FAFB] rounded-lg p-3">
+                  <div className="bg-[#F9FAFB] w-full flex flex-col items-start rounded-lg p-3">
                     <h3 className="text-xs text-[#4F4F4F] flex items-center gap-1 mb-1">
                       <i>
                         <svg
@@ -689,7 +780,7 @@ const BookingPage = () => {
                           onClick={() => handleTimeSelected(time, index)}
                           className={`py-4 px-3 text-xs border rounded-lg transition-colors ${
                             selectedTimeIndex === index
-                              ? "bg-[#1453FF] text-[white] border-[#1453FF]"
+                              ? "bg-[#1453FF] text-[white] border-2 border-[#1453FF] shadow-[0_0_0_2px_#BEDBFF]"
                               : "bg-[white] text-[#344054] border-[#D0D5DD] hover:border-[#1453FF]"
                           }`}
                         >
@@ -698,8 +789,8 @@ const BookingPage = () => {
                       ))}
                     </div>
 
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium text-[#344054] ">
+                    <div className="">
+                      <label className="block text-sm  text-[#344054] mb-2 ">
                         Any special requests?
                       </label>
                       <textarea
@@ -714,7 +805,8 @@ const BookingPage = () => {
                   <div className="w-full flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] rounded-2xl p-6 mt-8">
                     <div>
                       <span className="text-lg font-bold text-[#101828]">
-                        {productData.currency === "NGN" ? "₦" : "$"}
+                        {currencySymbols[productData.currency] ||
+                          productData.currency}
                         {productData.amount?.toLocaleString()}
                       </span>
                     </div>

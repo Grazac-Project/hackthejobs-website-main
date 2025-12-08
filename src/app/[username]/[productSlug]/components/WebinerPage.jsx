@@ -21,6 +21,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import PaystackPop from "@paystack/inline-js";
+import Error from "@/components/error";
 
 const WebinarPage = () => {
   const params = useParams();
@@ -315,11 +316,9 @@ const WebinarPage = () => {
 
   if (error || !productData) {
     return (
-      <div className="min-h-screen bg-[#F2F2F7] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">{error || "Product not found"}</p>
-        </div>
-      </div>
+      <>
+      <Error text={error || "Product not found"} path={`/${username}`} />
+      </>
     );
   }
 

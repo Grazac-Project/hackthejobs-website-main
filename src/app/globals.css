@@ -61,6 +61,7 @@ button.slick-arrow.slick-next {
   background-color: white;
   border: 1px solid #d0d5dd;
   font-family: --font-satoshi !important;
+  overflow: auto;
 }
 
 .react-calendar__tile.highlighted-date {

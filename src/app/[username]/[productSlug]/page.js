@@ -9,7 +9,7 @@ import BookingPage from "./components/bookingPage";
 
 const productPage = () => {
   const params = useParams();
- 
+
   const { username, productSlug } = params;
   const [productType, setProductType] = useState("");
   const [loader, setLoader] = useState(false);
@@ -23,7 +23,6 @@ const productPage = () => {
         const response = await getProductBySlug(username, productSlug);
 
         if (response.data && response.data.data && response.data.data.data) {
-          
           const productType = response.data.data.type; // "booking" or "webinar"
           setProductType(productType);
         } else {
@@ -38,7 +37,7 @@ const productPage = () => {
         );
       } finally {
         setLoader(false);
-         console.error("Error fetching product:");
+        console.error("Error fetching product:");
       }
     };
 
@@ -47,23 +46,21 @@ const productPage = () => {
     }
   }, [username, productSlug]);
 
-if (loader) {
+  if (loader) {
     return (
       <div className="min-h-screen bg-[#F2F2F7] flex items-center justify-center">
         <Load />
       </div>
     );
   }
-  return (
-    <div>
-      <BookingPage />
-      {/* {productType.toLowerCase() === "webinar" ? (
-        <WebinarPage />
-      ) : (
-        <DigitalProduct />
-      )} */}
-    </div>
-  );
+  if (productType.toLowerCase() === "booking") {
+    return <BookingPage />;
+  } else if (productType.toLowerCase() === "webinar") {
+    return <WebinarPage />;
+  } else {
+    // Default to DigitalProduct for 'digital_product' or any other type
+    return <DigitalProduct />;
+  }
 };
 
 export default productPage;
