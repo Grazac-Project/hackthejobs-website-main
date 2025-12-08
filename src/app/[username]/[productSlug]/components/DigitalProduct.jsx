@@ -70,7 +70,7 @@ const DigitalProduct = () => {
           setProvider(response.data.data?.provider);
           let mappedData;
           // console.log("FULL RESPONSE:", response);
-          // console.log(apiData, "apiData");
+          console.log(apiData, "apiData");
           setSeller(seller);
           setProduct(apiData);
           setProductData(apiData); // Fix: Set productData so it's available for payment
@@ -385,7 +385,31 @@ const DigitalProduct = () => {
 
               <select
                 className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+                value={product?.currency}
+                onChange={(e) => {
+                  const selectedCurrency = e.target.value;
+                  const pricingOption = product?.pricing?.find(
+                    (p) => p.currency === selectedCurrency
+                  );
+                  if (pricingOption) {
+                    setProduct((prev) => ({
+                      ...prev,
+                      amount: pricingOption.amount,
+                      currency: pricingOption.currency,
+                    }));
+                    setProductData((prev) => ({
+                      ...prev,
+                      amount: pricingOption.amount,
+                      currency: pricingOption.currency,
+                    }));
+                  }
+                }}
               >
+                {product?.pricing?.map((price) => (
+                  <option key={price._id} value={price.currency}>
+                    {price.currency}
+                  </option>
+                ))}
               </select>
             </div>
 

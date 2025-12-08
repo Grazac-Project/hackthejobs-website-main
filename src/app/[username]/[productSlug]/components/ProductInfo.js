@@ -94,7 +94,7 @@ const ProductInfo = ({
             </div>
             <div>
               <p className="text-[14px] font-medium text-[#000000]">
-                {location}
+                Google Meet
               </p>
               <p className="text-[12px] text-[#787878] mt-1">Online session</p>
             </div>

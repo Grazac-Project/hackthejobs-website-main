@@ -43,13 +43,13 @@ const Payment = ({
   const { startPayment } = useFincraPayment();
   const [showCheckout, setShowCheckout] = useState(false);
   const router = useRouter();
-  
+
   useEffect(() => {
-  // Prefetch product details page so routing is instant
-  if (expertSlug && productSlug) {
-    router.prefetch(`/${expertSlug}/${productSlug}`);
-  }
-}, [expertSlug, productSlug]);
+    // Prefetch product details page so routing is instant
+    if (expertSlug && productSlug) {
+      router.prefetch(`/${expertSlug}/${productSlug}`);
+    }
+  }, [expertSlug, productSlug]);
 
   // Set button label based on product type
   console.log({ productSlug })
@@ -297,14 +297,21 @@ const Payment = ({
       ) : (
         // 💳 Payment Modal
         <div className="w-[1005px] px-[56px] sm:w-full h-[90%] sm:h-[90%] mx-auto mt-10 sm:mt-5 sm:p-4 p-14 space-y-8 bg-[white] rounded-2xl sm:rounded-none fixed inset-0 z-50 overflow-y-auto lgx:w-[90%] md:w-[75%] xm:w-[100%] ">
-          <div className="flex items-center text-sm leading-[150%] font-medium text-[#292D32]">
-            <button
-              className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
-              onClick={onClick}
-            >
-              <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
-            </button>
-            <span className="text-2xl font-semibold ml-4">Back</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center text-sm leading-[150%] font-medium text-[#292D32]">
+              <button
+                className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
+                onClick={onClick}
+              >
+                <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
+              </button>
+              <span className="text-2xl font-semibold ml-4">Back</span>
+            </div>
+
+            <select
+                className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+              >
+              </select>
           </div>
 
           {/* Product Details */}
@@ -339,7 +346,7 @@ const Payment = ({
               <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] flex flex-col items-start h-[216px]">
                 {productDescription || ""}
                 <button
-                  onClick={() => {router.push(`/${expertSlug}/${productSlug}`)}}
+                  onClick={() => { router.push(`/${expertSlug}/${productSlug}`) }}
                   className="text-primary underline mt-[16px]"
                 >
                   View more
