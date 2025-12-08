@@ -301,6 +301,14 @@ const DigitalProduct = () => {
     }
   };
 
+  const currencySymbols = {
+    NGN: "₦",
+    USD: "$",
+    EUR: "€",
+    GBP: "£",
+  };
+
+
   const handleClose = () => {
     const isProduction = process.env.NEXT_PUBLIC_DOMAIN_DEV;
 
@@ -448,9 +456,7 @@ const DigitalProduct = () => {
                 <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">
                   <div className="text-[18px] font-bold text-[#333333]">
                     {product?.type === "paid"
-                      ? `${product.currency === "NGN" ? "₦" : "$"}${formatPrice(
-                        product?.amount
-                      )}`
+                      ? `${currencySymbols[product?.currency] || product?.currency}${formatPrice(product?.amount)}`
                       : "Free"}
                   </div>
                   <button

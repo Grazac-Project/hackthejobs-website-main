@@ -222,15 +222,15 @@ const WebinarPage = () => {
         setError("");
 
         const response = await getProductBySlug(username, productSlug);
-        console.log(response, "response");
-
+        
         if (response.data && response.data.data && response.data.data.data) {
           const apiData = response.data.data.data;
+          console.log(apiData, "response");
           const mentorData = response.data.data.mentor;
           const productType = response.data.data.type; // "booking" or "webinar"
           setProvider(response.data.data?.provider);
           let mappedData;
-
+          
           if (productType === "webinar") {
             // Map webinar response
             mappedData = {
@@ -252,6 +252,7 @@ const WebinarPage = () => {
               productType: "webinar",
               firstName: mentorData.firstName,
               lastName: mentorData.lastName,
+              pricing: apiData.pricing,
             };
           } else if (productType === "booking") {
             // Map booking response
@@ -276,7 +277,8 @@ const WebinarPage = () => {
               availabilitySlots: apiData.availabilitySlots || [],
               sessionDuration: apiData.sessionDuration,
               _id: apiData._id,
-              productType: "booking",
+              productType: "booking", 
+              pricing: apiData.pricing,
             };
           } else {
             setError("Unknown product type");
@@ -381,7 +383,26 @@ const WebinarPage = () => {
 
               <select
                 className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+               value={productData?.currency}
+                onChange={(e) => {
+                  const selectedCurrency = e.target.value;
+                  const pricingOption = productData?.pricing?.find(
+                    (p) => p.currency === selectedCurrency
+                  );
+                  if (pricingOption) {
+                    setProductData((prev) => ({
+                      ...prev,
+                      amount: pricingOption.amount,
+                      currency: pricingOption.currency,
+                    }));
+                  }
+                }}
               >
+                {productData?.pricing?.map((price) => (
+                  <option key={price._id} value={price.currency}>
+                    {price.currency}
+                  </option>
+                ))}
               </select>
             </div>
             {/* Product Hero and Info Section */}
