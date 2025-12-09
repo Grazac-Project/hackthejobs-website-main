@@ -473,8 +473,8 @@ const BookingPage = () => {
       slotId: bookingValues?._id,
       userId: productData?.mentorId,
       suggestion: requestNote,
-      amount: values?.amount ,
-      currency: values?.currency ,
+      amount: values?.amount,
+      currency: values?.currency,
       ...values,
     };
 
@@ -563,7 +563,7 @@ const BookingPage = () => {
   if (error || !productData) {
     return (
       <>
-      <Error text={error || "Product not found"} path={`/${username}`} />
+        <Error text={error || "Product not found"} path={`/${username}`} />
       </>
     );
   }
@@ -767,9 +767,11 @@ const BookingPage = () => {
                   nextLabel={<MdKeyboardArrowRight className="text-xl" />}
                 />
               </div>
-              {availableTimes.length > 0 && (
-                <div className="w-1/2 lg:w-full pl-6 lg:pl-0 flex flex-col">
-                  <div className="w-full flex flex-col border border-[#EAEAEA] bg-[#FAFAFA] rounded-2xl py-6 px-4">
+
+              <div className="w-1/2 lg:w-full pl-6 lg:pl-0 flex flex-col">
+                <div className="w-full h-full overflow-y-auto flex flex-col  border border-[#EAEAEA] bg-[#FAFAFA] rounded-2xl py-6 px-4">
+                  {availableTimes.length > 0 ? (
+                    <>
                     <h3 className="font-medium text-[14px] text-[#344054] mb-4">
                       Available Slots
                     </h3>
@@ -800,30 +802,33 @@ const BookingPage = () => {
                         className="w-full h-24 p-3 border border-[#D0D5DD] rounded-lg text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#1453FF]"
                       />
                     </div>
-                  </div>
-
-                  <div className="w-full flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] rounded-2xl p-6 mt-8">
-                    <div>
-                      <span className="text-lg font-bold text-[#101828]">
-                        {currencySymbols[productData.currency] ||
-                          productData.currency}
-                        {productData.amount?.toLocaleString()}
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => openCheckout()}
-                      disabled={selectedTimeIndex === null}
-                      className={`px-6 py-2 rounded-lg text-sm font-medium text-[white] transition-colors ${
-                        selectedTimeIndex !== null
-                          ? "bg-[#1453FF] hover:bg-blue-700"
-                          : "bg-gray-300 cursor-not-allowed"
-                      }`}
-                    >
-                      Make Payment
-                    </button>
-                  </div>
+                  </>
+                  ) : (
+                    <p className="text-sm text-[#292D32] max-w-[213px] text-center flex items-center justify-center m-auto  h-full">Select a date to view the available time slots</p>
+                  )}
                 </div>
-              )}
+
+                <div className="w-full flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] rounded-2xl p-6 mt-8">
+                  <div>
+                    <span className="text-lg font-bold text-[#101828]">
+                      {currencySymbols[productData.currency] ||
+                        productData.currency}
+                      {productData.amount?.toLocaleString()}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => openCheckout()}
+                    disabled={selectedTimeIndex === null}
+                    className={`px-6 py-2 rounded-lg text-sm font-medium text-[white] transition-colors ${
+                      selectedTimeIndex !== null
+                        ? "bg-[#1453FF] hover:bg-blue-700"
+                        : "bg-gray-300 cursor-not-allowed"
+                    }`}
+                  >
+                    Make Payment
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Product Details Section */}
