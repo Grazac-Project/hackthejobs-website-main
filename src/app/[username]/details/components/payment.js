@@ -36,7 +36,9 @@ const Payment = ({
   provider,
   productSlug,
   expertSlug,
-  productPricing
+  productPricing,
+  setProductPrice,
+  setProductCurrency
 }) => {
   const [loading, setLoading] = useState("Access Product");
   const [freeMode, setFreeMode] = useState(false);
@@ -244,6 +246,10 @@ const Payment = ({
   };
 
   const handleShowCheckout = () => {
+    // Update parent state with current selected values
+    if (setProductPrice) setProductPrice(currentPrice);
+    if (setProductCurrency) setProductCurrency(currentCurrency);
+
     setShowMain(false);
     setShowModal(false);
     setCheckout(true);
@@ -265,7 +271,7 @@ const Payment = ({
         (...args) =>
           handleClick(...args)
     );
-  }, []);
+  }, [currentCurrency, currentPrice, productType]);
 
 
   const currencySymbols = {

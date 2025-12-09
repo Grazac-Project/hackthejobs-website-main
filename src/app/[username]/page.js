@@ -384,7 +384,7 @@ const MentorDetails = () => {
     title,
     sessionType,
     category,
-    slug
+    slug,
   ) => {
     setBookingId(id);
     setBookType(type);
@@ -572,6 +572,8 @@ const MentorDetails = () => {
                       productSlug={productSlug}
                       expertSlug={slug}
                       productPricing={productPricing}
+                      setProductPrice={setProductPrice}
+                      setProductCurrency={setProductCurrency}
                     />
                   )}
                   {showBookingModal && (

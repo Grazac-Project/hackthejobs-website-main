@@ -17,7 +17,7 @@ const initialValues = {
   email: "",
 };
 
-const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, productDescription, productPrice, productCurrency, productType, category}) => {
+const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, productDescription, productPrice, productCurrency, productType, category,}) => {
   const router = useRouter();
   // const [loader, setLoader] = useState(false);
 

@@ -292,15 +292,21 @@ console.log({link})
         </div>
       ) : (
         <div className="max-w-[52rem] h-fit sm:h-full max-h-[90%] sm:max-h-full mx-auto mt-10 sm:mt-0 px-14 py-20 sm:px-6 space-y-8 bg-[white] rounded-2xl sm:rounded-none fixed inset-0 z-50 overflow-y-auto ">
+          <div className="flex items-center justify-between">            
           <div className=" flex items-center text-sm leading-[150%] font-medium text-[#292D32] ">
             <button
               className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
               onClick={onClick}
-            >
+              >
               <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
             </button>
             <span className="text-2xl font-semibold ml-4">Back</span>
           </div>
+           <select
+              className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+             >
+            </select>
+              </div>
 
           {/* Digital Products and webinar */}
           {loading ? (
