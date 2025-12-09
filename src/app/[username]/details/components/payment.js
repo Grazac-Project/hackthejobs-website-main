@@ -35,7 +35,8 @@ const Payment = ({
   makeFree,
   provider,
   productSlug,
-  expertSlug
+  expertSlug,
+  productPricing
 }) => {
   const [loading, setLoading] = useState("Access Product");
   const [freeMode, setFreeMode] = useState(false);
@@ -43,6 +44,15 @@ const Payment = ({
   const { startPayment } = useFincraPayment();
   const [showCheckout, setShowCheckout] = useState(false);
   const router = useRouter();
+
+
+  const [currentPrice, setCurrentPrice] = useState(productPrice);
+  const [currentCurrency, setCurrentCurrency] = useState(productCurrency);
+
+  useEffect(() => {
+    setCurrentPrice(productPrice);
+    setCurrentCurrency(productCurrency);
+  }, [productPrice, productCurrency]);
 
   useEffect(() => {
     // Prefetch product details page so routing is instant
@@ -102,8 +112,9 @@ const Payment = ({
   const handlePayment = async (x) => {
     try {
       setLoading("Initiating payment ...");
+      console.log(currentCurrency)
 
-      const payload = { productId, currency: productCurrency };
+      const payload = { productId, currency: currentCurrency };
 
       const res = await fincraDigitalCheckoutData(x);
 
@@ -157,8 +168,8 @@ const Payment = ({
       const fullname = `${x.firstName} ${x.lastName}`;
       // Trigger Fincra payment modal
       await startPayment({
-        price: Number(productPrice),
-        currency: String(productCurrency || "NGN").toUpperCase(),
+        price: Number(currentPrice),
+        currency: String(currentCurrency || "NGN").toUpperCase(),
         ref: reference,
         nameProp: fullname,
         emailProp: x.email,
@@ -239,9 +250,9 @@ const Payment = ({
   };
   // Handle all click types
   const handleClick = (val) => {
-    if (productType === "paid" && productCurrency === "NGN") {
+    if (productType === "paid" && currentCurrency === "NGN") {
       handlePayment(val);
-    } else if (productType === "paid" && productCurrency !== "NGN") {
+    } else if (productType === "paid" && currentCurrency !== "NGN") {
       handleForeignPayment(val);
     } else {
       handleAccessProduct(val);
@@ -255,6 +266,14 @@ const Payment = ({
           handleClick(...args)
     );
   }, []);
+
+
+  const currencySymbols = {
+    NGN: "₦",
+    USD: "$",
+    EUR: "€",
+    GBP: "£",
+  };
   // Redirect to dashboard after success
   const handleClose = () => {
     const isProduction = process.env.NEXT_PUBLIC_DOMAIN_DEV;
@@ -309,9 +328,29 @@ const Payment = ({
             </div>
 
             <select
-                className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
-              >
-              </select>
+              className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+              value={currentCurrency}
+              onChange={(e) => {
+                const selected = productPricing?.find((p) => p.currency === e.target.value);
+                if (selected) {
+                  setCurrentPrice(selected.amount);
+                  setCurrentCurrency(selected.currency);
+                } else if (!productPricing || productPricing.length === 0) {
+                  // Fallback if no pricing array, although logic implies we shouldn't be here if valid options are shown
+                  setCurrentCurrency(e.target.value)
+                }
+              }}
+            >
+              {productPricing && productPricing.length > 0 ? (
+                productPricing.map((price, index) => (
+                  <option key={index} value={price.currency}>
+                    {price.currency}
+                  </option>
+                ))
+              ) : (
+                <option value={productCurrency}>{productCurrency}</option>
+              )}
+            </select>
           </div>
 
           {/* Product Details */}
@@ -356,9 +395,7 @@ const Payment = ({
               <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">
                 <div className="text-[18px] font-bold text-[#333333]">
                   {productType === "paid"
-                    ? `${productCurrency === "NGN" ? "₦" : "$"}${formatPrice(
-                      productPrice
-                    )}`
+                    ? `${currencySymbols[currentCurrency] || currentCurrency}${formatPrice(currentPrice)}`
                     : "Free"}
                 </div>
                 <button
