@@ -262,10 +262,12 @@ const DigitalProduct = () => {
     };
     console.log("Foreign payment data:", data);
     setLoading(true);
-    fincraDigitalCheckoutData(data, token)
+    initializeDigitalProductPayment(data)
       .then((res) => {
-        console.log("fincraDigitalCheckoutData success:", res);
+        console.log("initializeDigitalProductPayment success:", res);
         setLoading(false);
+        // initializeDigitalProductPayment usually returns res.data.data.redirectUrl directly or in a nested structure.
+        // Checking payment.js: const url = res.data.data.redirectUrl;
         const url = res.data.data.redirectUrl;
         if (url) {
           console.log("Redirecting to:", url);
@@ -276,7 +278,7 @@ const DigitalProduct = () => {
         }
       })
       .catch((err) => {
-        console.error("fincraDigitalCheckoutData error:", err);
+        console.error("initializeDigitalProductPayment error:", err);
         toast.error(err.response?.data?.message || "Something went wrong");
         setLoading(false);
       });
