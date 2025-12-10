@@ -19,6 +19,7 @@ import PaystackPop from "@paystack/inline-js";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { extractFirstParagraph } from "@/Utils/stringUtils";
 function useCountdown(targetDate) {
   const target = useMemo(() => new Date(targetDate).getTime(), [targetDate]);
   const [timeLeft, setTimeLeft] = useState(() =>
@@ -95,7 +96,7 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
   //     document.body.style.overflow = prevBodyOverflow;
   //   };
   // }, []);
-  console.log({ link })
+  console.log({ link });
   const startsAt = webData?.startTime;
 
   const { days, hours, minutes, seconds, finished } = useCountdown(startsAt);
@@ -302,11 +303,12 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
               </button>
               <span className="text-2xl font-semibold ml-4">Back</span>
             </div>
-            <select
-              className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
-              value={webData?.currency}
-              onChange={(e) => {
-                const selectedCurrency = e.target.value;
+            {webData?.type !== "free" && (
+              <select
+                className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+                value={webData?.currency}
+                onChange={(e) => {
+                  const selectedCurrency = e.target.value;
                 const pricingOption = webData?.pricing?.find(
                   (p) => p.currency === selectedCurrency
                 );
@@ -325,6 +327,8 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
                 </option>
               ))}
             </select>
+            )}
+
           </div>
 
           {/* Digital Products and webinar */}
@@ -349,7 +353,7 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
                     {webData?.title}
                   </h3>
                   <p className="mt-3 text-[#787878] text-[14px] line-clamp-3">
-                    {webData?.description}
+                    {extractFirstParagraph(webData?.description)}
                   </p>
 
                   <button
@@ -375,14 +379,14 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
                       <p className="text-[14px] font-medium text-[#000000]">
                         {webData?.date
                           ? new Date(webData?.date).toLocaleDateString(
-                            "en-US",
-                            {
-                              weekday: "long",
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            }
-                          )
+                              "en-US",
+                              {
+                                weekday: "long",
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              }
+                            )
                           : ""}
                       </p>
                       <p className="text-[12px] text-[#787878] mt-1">
@@ -437,24 +441,24 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
                       <p className="text-[14px] font-medium text-[#000000]">
                         {webData?.startTime
                           ? new Date(webData?.startTime).toLocaleTimeString(
-                            "en-US",
-                            {
-                              hour: "numeric",
-                              minute: "2-digit",
-                              hour12: true,
-                            }
-                          )
+                              "en-US",
+                              {
+                                hour: "numeric",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
+                            )
                           : ""}{" "}
                         -{" "}
                         {webData?.endTime
                           ? new Date(webData?.endTime).toLocaleTimeString(
-                            "en-US",
-                            {
-                              hour: "numeric",
-                              minute: "2-digit",
-                              hour12: true,
-                            }
-                          )
+                              "en-US",
+                              {
+                                hour: "numeric",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
+                            )
                           : ""}
                       </p>
                       <p className="text-[12px] text-[#787878] mt-1">
@@ -468,15 +472,21 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
                   <div className="text-[24px] font-semibold text-[#000000]">
                     {webData?.type !== "free"
                       ? `${getCurrencySymbol(webData?.currency)}${formatPrice(
-                        webData?.amount
-                      )}`
+                          webData?.amount
+                        )}`
                       : "Free"}
                   </div>
                   <button
-                    // disabled={loading || submit || finished}
+                    disabled={loading || submit || finished}
                     className="rounded-lg bg-[#1453FF] px-6 py-3 text-[white] font-medium text-[14px] leading-5 cursor-pointer shadow hover:bg-[#0d36cc] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {submit ? "Redirecting.." : "Make Payment"}
+                    {finished
+                      ? "Event Closed"
+                      : webData?.type === "free"
+                      ? "Join Webinar"
+                      : submit
+                      ? "Redirecting.."
+                      : "Make Payment"}
                   </button>
                 </div>
               </div>
