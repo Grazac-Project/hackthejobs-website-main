@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-export default function Error({ text }) {
+export default function Error({ text, path }) {
   const router = useRouter();
   return (
     <div className="min-h-screen  bg-[#EFF6FF] xm:bg-[#fff]">
@@ -20,7 +20,7 @@ export default function Error({ text }) {
           </p>
           <button
             className="w-[275px] xm:w-[90%]  h-[46px]  font-whyte text-[16px] text-[#fff] font-medium bg-[#1453FF] leading-[150%] tracking-[3%] rounded-[8px]"
-            onClick={() => router.push("/market-place")}
+            onClick={() => router.push(path || "/market-place")}
           >
             Go back
           </button>

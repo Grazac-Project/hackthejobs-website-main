@@ -21,6 +21,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import PaystackPop from "@paystack/inline-js";
+import Error from "@/components/error";
 
 const WebinarPage = () => {
   const params = useParams();
@@ -37,7 +38,7 @@ const WebinarPage = () => {
   const [success, setSuccess] = useState(false);
   const [token, setToken] = useState("");
   const [provider, setProvider] = useState("");
-  const [main , setMain] = useState(true);
+  const [main, setMain] = useState(true);
   // Get token from cookies
   useEffect(() => {
     const data = Cookies.get("user_details");
@@ -222,16 +223,19 @@ const WebinarPage = () => {
         setError("");
 
         const response = await getProductBySlug(username, productSlug);
-
+        
         if (response.data && response.data.data && response.data.data.data) {
           const apiData = response.data.data.data;
+          console.log(apiData, "response");
+          const mentorData = response.data.data.mentor;
           const productType = response.data.data.type; // "booking" or "webinar"
           setProvider(response.data.data?.provider);
           let mappedData;
-
+          
           if (productType === "webinar") {
             // Map webinar response
             mappedData = {
+              profilePic: apiData.profilePic,
               title: apiData.title,
               description: apiData.description,
               thumbnail:
@@ -247,6 +251,9 @@ const WebinarPage = () => {
               fullDescription: apiData.description,
               _id: apiData._id,
               productType: "webinar",
+              firstName: mentorData.firstName,
+              lastName: mentorData.lastName,
+              pricing: apiData.pricing,
             };
           } else if (productType === "booking") {
             // Map booking response
@@ -271,7 +278,8 @@ const WebinarPage = () => {
               availabilitySlots: apiData.availabilitySlots || [],
               sessionDuration: apiData.sessionDuration,
               _id: apiData._id,
-              productType: "booking",
+              productType: "booking", 
+              pricing: apiData.pricing,
             };
           } else {
             setError("Unknown product type");
@@ -286,7 +294,7 @@ const WebinarPage = () => {
         console.error("Error fetching product:", err);
         setError(
           err.response?.data?.message ||
-            "Failed to load product. Please try again."
+          "Failed to load product. Please try again."
         );
       } finally {
         setLoading(false);
@@ -308,11 +316,9 @@ const WebinarPage = () => {
 
   if (error || !productData) {
     return (
-      <div className="min-h-screen bg-[#F2F2F7] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">{error || "Product not found"}</p>
-        </div>
-      </div>
+      <>
+      <Error text={error || "Product not found"} path={`/${username}`} />
+      </>
     );
   }
 
@@ -334,7 +340,7 @@ const WebinarPage = () => {
       {main && (
         <div className="max-w-[1102px] mx-auto mt-10 mb-10 px-6">
           {/* Back Button */}
-          <div className="mb-8 flex items-center text-sm leading-[150%] font-medium text-[#292D32]">
+          {/* <div className="mb-8 flex items-center text-sm leading-[150%] font-medium text-[#292D32]">
             <button
               className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer hover:bg-gray-50 transition-colors"
               onClick={() => router.back()}
@@ -342,10 +348,62 @@ const WebinarPage = () => {
               <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
             </button>
             <span className="text-2xl font-semibold ml-4">Back</span>
-          </div>
+          </div> */}
 
           {/* Main Content Card */}
           <div className="bg-[white] rounded-2xl p-8 md:p-6 sm:p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-[35px]">
+              <div
+                onClick={() => router.push(`/${username}`)}
+                className="flex items-center gap-[12px]  p-[8px] rounded-[8px] bg-[#FAFAFA] w-[210px] xm:w-[168px] whitespace-nowrap cursor-pointer border border-[#EDEDED] truncate sxm:hidden">
+                <Image
+                  src={productData.profilePic}
+                  alt="profilepics"
+                  width={32}
+                  height={32}
+                />
+                <div className="flex flex-col">
+                  <p className="text-[12px] text-[#101828] mb-[2px] font-normal">Listed by</p>
+                  <p className="text-[16px] text-[#101828] xm:text-[12px] font-medium truncate">
+                    {productData.firstName} {productData.lastName}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center text-sm leading-[150%] font-medium text-[#292D32] sxm:block 3xl:hidden">
+                <button
+                  className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
+                  onClick={() => router.push(`/${username}`)}
+                >
+                  <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
+                </button>
+                <span className="text-2xl font-semibold ml-2">Back</span>
+              </div>
+
+              <select
+                className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+               value={productData?.currency}
+                onChange={(e) => {
+                  const selectedCurrency = e.target.value;
+                  const pricingOption = productData?.pricing?.find(
+                    (p) => p.currency === selectedCurrency
+                  );
+                  if (pricingOption) {
+                    setProductData((prev) => ({
+                      ...prev,
+                      amount: pricingOption.amount,
+                      currency: pricingOption.currency,
+                    }));
+                  }
+                }}
+              >
+                {productData?.pricing?.map((price) => (
+                  <option key={price._id} value={price.currency}>
+                    {price.currency}
+                  </option>
+                ))}
+              </select>
+            </div>
             {/* Product Hero and Info Section */}
             <div className="flex lg:flex-col gap-8 mb-8">
               <ProductHero

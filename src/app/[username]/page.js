@@ -145,6 +145,7 @@ const MentorDetails = () => {
   const [bookingId, setBookingId] = useState("");
   const [mentorPrice, setMentorPrice] = useState("");
   const [sessionType, setSessionType] = useState("");
+  const [productPricing, setProductPricing] = useState([]);
   const [successModal, setSuccessModal] = useState(false);
   const [successPaymentModal, setSuccessPaymentModal] = useState(false);
   const [freeMode, setFreeMode] = useState(false);
@@ -159,7 +160,7 @@ const MentorDetails = () => {
   const [provider, setProvider] = useState("");
   const [link, setLink] = useState("");
   const [productSlug, setProductSlug] = useState("");
-  
+
 
   const checkboxRef = useRef(null);
   // const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -219,7 +220,7 @@ const MentorDetails = () => {
     // console.log({ token });
     getMentorsBySlug(username)
       .then((res) => {
-        // console.log(res);
+        console.log(res);
         setMentorData(res.data.data.data);
         setMentorId(res.data.data.data.mentor._id);
         setProvider(res.data.data.data.provider);
@@ -279,9 +280,8 @@ const MentorDetails = () => {
   // console.log(mentData);
 
   const shareMentorProfile = () => {
-    const shareUrl = `${pathname}${
-      searchParams.toString() ? "?" + searchParams.toString() : ""
-    }`;
+    const shareUrl = `${pathname}${searchParams.toString() ? "?" + searchParams.toString() : ""
+      }`;
 
     if (navigator.share) {
       navigator
@@ -383,7 +383,8 @@ const MentorDetails = () => {
     description,
     title,
     sessionType,
-    category
+    category,
+    slug,
   ) => {
     setBookingId(id);
     setBookType(type);
@@ -393,7 +394,8 @@ const MentorDetails = () => {
     setProductTitle(title);
     setLoading(false);
     setSessionType(sessionType);
-    setCategory(category)
+    setCategory(category);
+    setProductSlug(slug);
     // console.log(bookingId, bookType, mentorPrice, currency);
     setShowBookingModal(true);
 
@@ -425,7 +427,7 @@ const MentorDetails = () => {
 
   const handleButtonClick = () => {
     console.log("Preferred button clicked");
-    checkboxRef.current?.click(); 
+    checkboxRef.current?.click();
   };
   const BuyDigitalProduct = (
     id,
@@ -437,7 +439,8 @@ const MentorDetails = () => {
     thumbnail,
     category,
     accessType,
-    Slug
+    Slug,
+    pricing
   ) => {
     // if (token) {
     setProductId(id);
@@ -450,6 +453,7 @@ const MentorDetails = () => {
     setCategory('Digital Product');
     setAccessType(accessType);
     setProductSlug(Slug)
+    setProductPricing(pricing)
     // console.log({ id });
     setShowModal(true);
     // }
@@ -502,9 +506,8 @@ const MentorDetails = () => {
     successModal && (
       <BookingModal
         mentorId={bookingId}
-        mentor={`${
-          mentorData?.mentor?.firstName + " " + mentorData?.mentor?.lastName
-        }`}
+        mentor={`${mentorData?.mentor?.firstName + " " + mentorData?.mentor?.lastName
+          }`}
         closeModal={() => setSuccessModal(false)}
       />
     );
@@ -524,10 +527,11 @@ const MentorDetails = () => {
         sessionType={sessionType}
         slot={slot}
         setSlot={setSlot}
+        ProductSlug={productSlug}
       />
     );
   }
-    console.log("Provider in Payment component:", provider);
+  console.log("Provider in Payment component:", provider);
 
   return (
     <>
@@ -566,7 +570,10 @@ const MentorDetails = () => {
                       makeFree={() => setFreeMode(true)}
                       provider={provider}
                       productSlug={productSlug}
-                      expertSlug= {slug}
+                      expertSlug={slug}
+                      productPricing={productPricing}
+                      setProductPrice={setProductPrice}
+                      setProductCurrency={setProductCurrency}
                     />
                   )}
                   {showBookingModal && (
@@ -587,16 +594,16 @@ const MentorDetails = () => {
                       setSlot={setSlot}
                       setLoadingState={setLoader}
                       provider={provider}
+                      bookingSlug={productSlug}
                     />
                   )}
                   {successModal && (
                     <BookingModal
                       mentorId={bookingId}
-                      mentor={`${
-                        mentorData?.mentor?.firstName +
+                      mentor={`${mentorData?.mentor?.firstName +
                         " " +
                         mentorData?.mentor?.lastName
-                      }`}
+                        }`}
                       closeModal={() => setSuccessModal(false)}
                     />
                   )}
@@ -604,7 +611,7 @@ const MentorDetails = () => {
                     <PaymentModal
                       productTitle={productTitle}
                       freeMode={freeMode}
-                      // closeModal={() => setSuccessModal(false)}
+                    // closeModal={() => setSuccessModal(false)}
                     />
                   )}
                   {showWebModal && (
@@ -633,7 +640,7 @@ const MentorDetails = () => {
                         </div>
                       </Link>
 
-                     <div className="min-h-[212px]  mx-auto bg-[#ffffff] py-6 px-20 lg:px-10 md:px-4 mb-[10px]  rounded-[8px] ">
+                      <div className="min-h-[212px]  mx-auto bg-[#ffffff] py-6 px-20 lg:px-10 md:px-4 mb-[10px]  rounded-[8px] ">
                         <div className="flex md:flex-col justify-between items-center gap-3 ">
                           <div className="flex sm:flex-col  gap-3 items-center justify-center">
                             <Image
@@ -717,70 +724,70 @@ const MentorDetails = () => {
                                   mentorData?.mentor?.twitterLink ||
                                   mentorData?.mentor?.facebookLink ||
                                   mentorData?.mentor?.instagramLink) && (
-                                  <div className="flex gap-2">
-                                    {mentorData?.mentor?.facebookLink && (
-                                      <a
-                                        href={mentorData.mentor.facebookLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
-                                      >
-                                        <Image
-                                          src="/facebook-1.svg"
-                                          width={16}
-                                          height={16}
-                                          alt="instagram"
-                                        />
-                                      </a>
-                                    )}
-                                    {mentorData?.mentor?.instagramLink && (
-                                      <a
-                                        href={mentorData.mentor.instagramLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
-                                      >
-                                        <Image
-                                          src="/instagram-1.svg"
-                                          width={16}
-                                          height={16}
-                                          alt="instagram"
-                                        />
-                                      </a>
-                                    )}
+                                    <div className="flex gap-2">
+                                      {mentorData?.mentor?.facebookLink && (
+                                        <a
+                                          href={mentorData.mentor.facebookLink}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
+                                        >
+                                          <Image
+                                            src="/facebook-1.svg"
+                                            width={16}
+                                            height={16}
+                                            alt="instagram"
+                                          />
+                                        </a>
+                                      )}
+                                      {mentorData?.mentor?.instagramLink && (
+                                        <a
+                                          href={mentorData.mentor.instagramLink}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
+                                        >
+                                          <Image
+                                            src="/instagram-1.svg"
+                                            width={16}
+                                            height={16}
+                                            alt="instagram"
+                                          />
+                                        </a>
+                                      )}
 
-                                    {mentorData?.mentor?.twitterLink && (
-                                      <a
-                                        href={mentorData.mentor.twitterLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
-                                      >
-                                        <XIcon
-                                          style={{
-                                            fontSize: 16,
-                                          }}
-                                        />
-                                      </a>
-                                    )}
+                                      {mentorData?.mentor?.twitterLink && (
+                                        <a
+                                          href={mentorData.mentor.twitterLink}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
+                                        >
+                                          <XIcon
+                                            style={{
+                                              fontSize: 16,
+                                            }}
+                                          />
+                                        </a>
+                                      )}
 
-                                    {mentorData?.mentor?.linkedinLink && (
-                                      <a
-                                        href={mentorData.mentor.linkedinLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
-                                      >
-                                        <Image
-                                          src="/linkedin-1.svg"
-                                          width={16}
-                                          height={16}
-                                          alt="linkedin"
-                                        />
-                                      </a>
-                                    )}
-                                  </div>
-                                )}
+                                      {mentorData?.mentor?.linkedinLink && (
+                                        <a
+                                          href={mentorData.mentor.linkedinLink}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
+                                        >
+                                          <Image
+                                            src="/linkedin-1.svg"
+                                            width={16}
+                                            height={16}
+                                            alt="linkedin"
+                                          />
+                                        </a>
+                                      )}
+                                    </div>
+                                  )}
                               </div>
                             </div>
                           </div>
@@ -788,8 +795,8 @@ const MentorDetails = () => {
                           <a href="#book-session">
                             <button
                               className={`md:hidden w-[183px]  h-[44.43px] leading-[150%] text-[12.57px] text-[#ffff] bg-primary  rounded-[6.29px] `}
-                              // onClick={bookSession}
-                              // onClick={handleNextPage}
+                            // onClick={bookSession}
+                            // onClick={handleNextPage}
                             >
                               View all packages
                             </button>
@@ -798,11 +805,10 @@ const MentorDetails = () => {
                       </div>
                       {/* First eNDING */}
                       <div
-                        className={`bg-[white] rounded-2xl ${
-                          mentorData?.reviews?.length > 0
-                            ? "flex flex-row md:flex-col" // show both sides
-                            : "flex flex-col" // left side full width
-                        }`}
+                        className={`bg-[white] rounded-2xl ${mentorData?.reviews?.length > 0
+                          ? "flex flex-row md:flex-col" // show both sides
+                          : "flex flex-col" // left side full width
+                          }`}
                       >
                         {/* <div className="w-[45%] md:w-full  ">
                           <div className="min-h-[186px] border border-[#F2F2F7] border-r-[#EAEAEA] border-b-[#EAEAEA] flex px-4 items-center justify-center gap-2 py-8 ">
@@ -861,11 +867,10 @@ const MentorDetails = () => {
                           <div className="block md:hidden h-[5%] border  border-[#fff] border-r-[#EAEAEA]   p-8 md:px-4 "></div>
                         </div> */}
                         <div
-                          className={`transition-all duration-300 ${
-                            mentorData?.reviews?.length > 0
-                              ? "w-[55%] md:w-full  border-[#EAEAEA]" // when reviews exist
-                              : "w-full" // no reviews → full width
-                          }`}
+                          className={`transition-all duration-300 ${mentorData?.reviews?.length > 0
+                            ? "w-[55%] md:w-full  border-[#EAEAEA]" // when reviews exist
+                            : "w-full" // no reviews → full width
+                            }`}
                         >
                           <div className="py-6 md:py-4 md:px-4 sm:px-0 border border-[#fff] border-b-[#EAEAEA] ">
                             <div className="flex justify-between items-center border border-[#fff] border-b-[#EAEAEA] mx-12 md:mx-4 py-[8.5px]  ">
@@ -928,12 +933,12 @@ const MentorDetails = () => {
                                     </h4>
                                     {mentorData?.mentor?.yearsOfExperience >
                                       0 && (
-                                      <div className="border border-primary w-[77px] h-6 text-primary text-[14px] font-medium leading-[120%] flex justify-center items-center text-center">
-                                        {mentorData?.mentor?.yearsOfExperience +
-                                          " " +
-                                          "years" || ""}
-                                      </div>
-                                    )}
+                                        <div className="border border-primary w-[77px] h-6 text-primary text-[14px] font-medium leading-[120%] flex justify-center items-center text-center">
+                                          {mentorData?.mentor?.yearsOfExperience +
+                                            " " +
+                                            "years" || ""}
+                                        </div>
+                                      )}
                                   </div>
                                   <div className="flex flex-col gap-4">
                                     {mentorData?.mentor?.experience?.map(
@@ -974,14 +979,14 @@ const MentorDetails = () => {
                                               -{" "}
                                               {exp.endDate
                                                 ? new Date(
-                                                    exp.endDate
-                                                  ).toLocaleDateString(
-                                                    "en-US",
-                                                    {
-                                                      year: "numeric",
-                                                      month: "short",
-                                                    }
-                                                  )
+                                                  exp.endDate
+                                                ).toLocaleDateString(
+                                                  "en-US",
+                                                  {
+                                                    year: "numeric",
+                                                    month: "short",
+                                                  }
+                                                )
                                                 : "Present"}
                                             </p>
                                           </div>
@@ -1010,14 +1015,14 @@ const MentorDetails = () => {
                           </div>
                         </div>
 
-                             {mentorData?.reviews?.length > 0 && (
-                        <div className=" border border-[#fff] border-b-[#EAEAEA] px-12 md:px-4  py-6">
-                          <div className="flex justify-between gap-2 items-center  mb-6 ">
-                            <h4 className="text-[12px] leading-[120%] font-medium ">
-                              Reviews
-                            </h4>
-                            {/* Show "View All" only if not all reviews are currently displayed */}
-                            {view < mentorData?.reviews?.length && (
+                        {mentorData?.reviews?.length > 0 && (
+                          <div className=" border border-[#fff] border-b-[#EAEAEA] px-12 md:px-4  py-6">
+                            <div className="flex justify-between gap-2 items-center  mb-6 ">
+                              <h4 className="text-[12px] leading-[120%] font-medium ">
+                                Reviews
+                              </h4>
+                              {/* Show "View All" only if not all reviews are currently displayed */}
+                              {view < mentorData?.reviews?.length && (
                                 <p
                                   className=" w-[77px] h-6 text-primary text-[14px] font-medium leading-[120%] underline flex justify-center items-center text-center cursor-pointer"
                                   onClick={() =>
@@ -1026,75 +1031,75 @@ const MentorDetails = () => {
                                 >
                                   View All
                                 </p>
-                            )}
-                          </div>
-                          
-                          {/* The scrollable div with max height */}
-                          <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4">
-                            {mentorData?.reviews
-                              ?.slice(0, view)
-                              .map((element, i) => (
-                                <div
-                                  key={i}
-                                  // Removed margin-bottom (mb-2/mb-4) and used space-y-4 on parent for spacing
-                                  className="min-h-[132px] w-[351px] sm:w-[100%] md:w-[100%] border border-[#EAEAEA] p-3 flex  gap-4 bg-[#F7F7F7] rounded-lg flex-col"
-                                >
-                                  <div className="py-4">
-                                    <div className="flex justify-between items-center ">
-                                      <div className="flex gap-2 items-center">
-                                        <Image
-                                          src={element.user.profilePic}
-                                          alt="avatar"
-                                          width={32}
-                                          height={32}
-                                          className="h-[32px] w-[32px] object-cover rounded-[50%]"
-                                        />
-                                        <h4 className="text-[12px] leading-[140%] font-medium ">
-                                          {element.user.firstName}{" "}
-                                          {element.user.laststName}
-                                        </h4>
-                                      </div>
-                                      <div className="flex  items-center gap-2 ">
-                                        <div className="flex items-center ">
-                                          {Array.from({ length: 5 }).map((_, i) =>
-                                            i < element.rating ? (
-                                              <Image
-                                                key={i}
-                                                src="/rate.svg"
-                                                alt="star"
-                                                width={14}
-                                                height={14}
-                                                className=""
-                                              />
-                                            ) : (
-                                              <Image
-                                                key={i}
-                                                src="/rate2.svg"
-                                                alt="star"
-                                                width={14}
-                                                height={14}
-                                                className=""
-                                              />
-                                            )
-                                          )}
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                          <h4 className="text-[10px] leading-[140%] font-inter font-medium text-[#333333] ">
-                                            {element.rating + "." + "0" || 0}
+                              )}
+                            </div>
+
+                            {/* The scrollable div with max height */}
+                            <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4">
+                              {mentorData?.reviews
+                                ?.slice(0, view)
+                                .map((element, i) => (
+                                  <div
+                                    key={i}
+                                    // Removed margin-bottom (mb-2/mb-4) and used space-y-4 on parent for spacing
+                                    className="min-h-[132px] w-[351px] sm:w-[100%] md:w-[100%] border border-[#EAEAEA] p-3 flex  gap-4 bg-[#F7F7F7] rounded-lg flex-col"
+                                  >
+                                    <div className="py-4">
+                                      <div className="flex justify-between items-center ">
+                                        <div className="flex gap-2 items-center">
+                                          <Image
+                                            src={element.user.profilePic}
+                                            alt="avatar"
+                                            width={32}
+                                            height={32}
+                                            className="h-[32px] w-[32px] object-cover rounded-[50%]"
+                                          />
+                                          <h4 className="text-[12px] leading-[140%] font-medium ">
+                                            {element.user.firstName}{" "}
+                                            {element.user.laststName}
                                           </h4>
                                         </div>
+                                        <div className="flex  items-center gap-2 ">
+                                          <div className="flex items-center ">
+                                            {Array.from({ length: 5 }).map((_, i) =>
+                                              i < element.rating ? (
+                                                <Image
+                                                  key={i}
+                                                  src="/rate.svg"
+                                                  alt="star"
+                                                  width={14}
+                                                  height={14}
+                                                  className=""
+                                                />
+                                              ) : (
+                                                <Image
+                                                  key={i}
+                                                  src="/rate2.svg"
+                                                  alt="star"
+                                                  width={14}
+                                                  height={14}
+                                                  className=""
+                                                />
+                                              )
+                                            )}
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <h4 className="text-[10px] leading-[140%] font-inter font-medium text-[#333333] ">
+                                              {element.rating + "." + "0" || 0}
+                                            </h4>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <p className="text-[#4F4F4F] leading-[140%] text-[14px] pt-4">
+                                          {element.comment}
+                                        </p>
                                       </div>
                                     </div>
-                                    <div>
-                                      <p className="text-[#4F4F4F] leading-[140%] text-[14px] pt-4">
-                                        {element.comment}
-                                      </p>
-                                    </div>
                                   </div>
-                                </div>
-                              ))}
+                                ))}
+                            </div>
                           </div>
-                        </div>
                         )}
                       </div>
                     </div>
@@ -1129,7 +1134,8 @@ const MentorDetails = () => {
                                         book?.thumbnail,
                                         book?.category,
                                         book?.accessType,
-                                        book?.slug
+                                        book?.slug,
+                                        book?.pricing
                                       )
                                     }
                                   >
@@ -1192,17 +1198,17 @@ const MentorDetails = () => {
                                             details?.description,
                                             details?.title,
                                             null,
-                                            '1-on-1 Session'
+                                            '1-on-1 Session',
+                                            details?.slug
                                           )
                                         }
                                       >
                                         <div className="flex gap-[16px] justify-between items-center mb-[10px] ">
                                           <div
-                                            className={` h-[22px] px-3 rounded-full flex items-center justify-center ${
-                                              details.bookingType === "Paid"
-                                                ? " bg-[#DEA8061A]"
-                                                : " bg-[#3333331A]"
-                                            }`}
+                                            className={` h-[22px] px-3 rounded-full flex items-center justify-center ${details.bookingType === "Paid"
+                                              ? " bg-[#DEA8061A]"
+                                              : " bg-[#3333331A]"
+                                              }`}
                                           >
                                             {details.bookingType === "Paid" && (
                                               <Image
@@ -1214,11 +1220,10 @@ const MentorDetails = () => {
                                               />
                                             )}
                                             <span
-                                              className={` text-[12px] font-medium leading-[18px] font-inter ${
-                                                details?.bookingType === "Paid"
-                                                  ? "text-[#F3B704]"
-                                                  : "text-[#333333]"
-                                              } `}
+                                              className={` text-[12px] font-medium leading-[18px] font-inter ${details?.bookingType === "Paid"
+                                                ? "text-[#F3B704]"
+                                                : "text-[#333333]"
+                                                } `}
                                             >
                                               {capitalizeFirstLetter(details?.bookingType)}
                                             </span>
@@ -1278,7 +1283,8 @@ const MentorDetails = () => {
                                           pkg?.description,
                                           pkg?.title,
                                           "mentorship",
-                                          'Package'
+                                          'Package',
+
                                         )
                                       }
                                     >
@@ -1287,7 +1293,7 @@ const MentorDetails = () => {
                                         style={{
                                           borderTopColor:
                                             groupColors[
-                                              idx % groupColors.length
+                                            idx % groupColors.length
                                             ],
                                         }}
                                       >
@@ -1295,14 +1301,13 @@ const MentorDetails = () => {
                                           <span
                                             className="text-xs px-2 py-1 rounded-[32px] font-medium"
                                             style={{
-                                              backgroundColor: `${
-                                                groupColors[
-                                                  idx % groupColors.length
-                                                ]
-                                              }1A`,
+                                              backgroundColor: `${groupColors[
+                                                idx % groupColors.length
+                                              ]
+                                                }1A`,
                                               color:
                                                 groupColors[
-                                                  idx % groupColors.length
+                                                idx % groupColors.length
                                                 ],
                                             }}
                                           >
@@ -1312,7 +1317,7 @@ const MentorDetails = () => {
                                               : "Week"}
                                           </span>
                                           {pkg?.bookingType.toLowerCase() ===
-                                          "paid" ? (
+                                            "paid" ? (
                                             <div className="text-right text-sm font-semibold">
                                               {getCurrencySymbol(pkg?.currency)}
                                               {formatPrice(pkg?.amount)}

@@ -46,6 +46,11 @@ const ProductInfo = ({
     return diffDays > 0 ? diffDays : 0;
   };
 
+  const isEventPassed = () => {
+    if (!startTime) return false;
+    return new Date(startTime) < new Date();
+  };
+
   return (
     <div className="flex flex-col gap-6 w-full">
       {/* Title and Description */}
@@ -94,7 +99,7 @@ const ProductInfo = ({
             </div>
             <div>
               <p className="text-[14px] font-medium text-[#000000]">
-                {location}
+                Google Meet
               </p>
               <p className="text-[12px] text-[#787878] mt-1">Online session</p>
             </div>
@@ -136,9 +141,18 @@ const ProductInfo = ({
           </div>
           <button
             onClick={onMakePayment}
-            className="rounded-lg bg-[#1453FF] px-6 py-3 text-[white] font-medium text-[14px] leading-5 cursor-pointer shadow hover:bg-[#0d36cc] focus:outline-none transition-colors"
+            disabled={isEventPassed()}
+            className={`rounded-lg px-6 py-3 text-[white] font-medium text-[14px] leading-5 shadow transition-colors ${
+              isEventPassed()
+                ? "bg-[#0d36cc]/80 cursor-not-allowed"
+                : "bg-[#1453FF] hover:bg-[#0d36cc] cursor-pointer"
+            }`}
           >
-            Make Payment
+            {isEventPassed()
+              ? "Event Closed"
+              : type === "free"
+              ? "Join Webinar"
+              : "Make Payment"}
           </button>
         </div>
       </div>
