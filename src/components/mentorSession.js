@@ -20,7 +20,7 @@ const MentorSession = ({ closeSessionModal, mentorId, mentorImage, mentorDetails
   const [token, setToken] = useState();
   const [mentorData, setMentorData] = useState([]);
   const [bookingData, setBookingData] = useState([]);
-    const [bookingId, setBookingId] = useState(mentorId);
+  const [bookingId, setBookingId] = useState(mentorId);
   const [bookType, setBookType] = useState("");
   const [mentorPrice, setMentorPrice] = useState("")
   const [currency , setCurrency] = useState("")
@@ -44,10 +44,10 @@ const MentorSession = ({ closeSessionModal, mentorId, mentorImage, mentorDetails
       setBookType(type);
       setMentorPrice(amount);
       setCurrency(bookingCurrency);
-      
+
       setShowBookSession(true);
 
-      
+
     } else {
       window.location.href = "https://dashboard.hackthejobs.com/auth/signup";
     }
@@ -69,7 +69,7 @@ const MentorSession = ({ closeSessionModal, mentorId, mentorImage, mentorDetails
         // console.log(err)
       });
   }, []);
-const openModal = () => {
+  const openModal = () => {
     setShowBookingModal(true);
     // closeSessionModal();
   };
@@ -77,7 +77,7 @@ const openModal = () => {
     setShowBookSession(false);
     closeSessionModal();
   };
-  
+
   return (
     <div>
       <ToastContainer />
@@ -86,21 +86,21 @@ const openModal = () => {
           mentorId={bookingId}
           mentor={mentorDetails}
           closeModal={closeSesModal}
-          
-          
+
+
         />
       )}
       <>
         {showBookSession ? (
           <BookSession
             mentorId={bookingId}
-              image={mentorImage}
-              closeModal={() => setShowBookSession(false)}
-              successModal={openModal}
-              type={bookType}
-              price={mentorPrice}
-              mentor={mentorDetails}
-              bookingCurrency={currency}
+            image={mentorImage}
+            closeModal={() => setShowBookSession(false)}
+            successModal={openModal}
+            type={bookType}
+            price={mentorPrice}
+            mentor={mentorDetails}
+            bookingCurrency={currency}
           />
         ) : (
           <div className="font-satoshi">
@@ -139,9 +139,9 @@ const openModal = () => {
                         <div
                           className={`w-[61px] h-[22px] rounded-full flex items-center justify-center ${
                             bookings?.type === "Paid"
-                              ? " bg-[#DEA8061A]"
-                              : " bg-[#3333331A]"
-                          }`}
+                            ? " bg-[#DEA8061A]"
+                            : " bg-[#3333331A]"
+                            }`}
                         >
                           {bookings?.type === "Paid" && (
                             <Image
@@ -155,9 +155,9 @@ const openModal = () => {
                           <span
                             className={` text-[12px] font-medium leading-[18px] font-inter ${
                               bookings?.type === "Paid"
-                                ? "text-[#F3B704]"
-                                : "text-[#333333]"
-                            } `}
+                              ? "text-[#F3B704]"
+                              : "text-[#333333]"
+                              } `}
                           >
                             {bookings?.type}
                           </span>
@@ -173,7 +173,7 @@ const openModal = () => {
                             />
 
                             <span className="text-[#333333] text-[14px] font-bold leading-[140%] font-inter ">
-                             {getCurrencySymbol(bookings.currency)}{formatPrice(bookings?.amount)}
+                              {getCurrencySymbol(bookings.currency)}{formatPrice(bookings?.amount)}
                             </span>
                           </div>
                         )}

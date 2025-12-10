@@ -528,6 +528,7 @@ const BookSession = ({
           </div>
         ) : (
           <div className="h-full bg-[#fff] w-full max-w-[629px] md:max-w-full p-8 sm:p-3 pb-[277px] sm:pb-[41px] overflow-y-auto flex flex-col fixed top-0 right-0 z-50">
+
             <div className="pb-[40px] flex gap-[16px] items-center">
               <div
                 className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
