@@ -13,6 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { FiDownload, FiEye } from "react-icons/fi";
 import PaystackPop from "@paystack/inline-js";
 import { useRouter } from "next/navigation";
+import { extractFirstParagraph } from "@/Utils/stringUtils";
 
 const Payment = ({
   onClick,
@@ -332,7 +333,7 @@ const Payment = ({
               </button>
               <span className="text-2xl font-semibold ml-4">Back</span>
             </div>
-
+{productType === "paid" && (
             <select
               className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
               value={currentCurrency}
@@ -357,6 +358,7 @@ const Payment = ({
                 <option value={productCurrency}>{productCurrency}</option>
               )}
             </select>
+          )}
           </div>
 
           {/* Product Details */}
@@ -389,7 +391,7 @@ const Payment = ({
               <hr className="border border-[#EAEAEA] " />
 
               <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] flex flex-col items-start h-[216px]">
-                {productDescription || ""}
+                {extractFirstParagraph(productDescription) || ""}
                 <button
                   onClick={() => { router.push(`/${expertSlug}/${productSlug}`) }}
                   className="text-primary underline mt-[16px]"

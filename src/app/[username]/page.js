@@ -33,6 +33,7 @@ import WebinarModal from "./details/components/webinalReg";
 import PaymentModal from "@/components/payment-modal";
 import { RiInstagramFill } from "react-icons/ri";
 import { FaFacebook } from "react-icons/fa6";
+import { extractFirstParagraph } from "@/Utils/stringUtils";
 
 
 const groupColors = [
@@ -1244,7 +1245,7 @@ const MentorDetails = () => {
                                           {details?.title}
                                         </div>
                                         <p className="text-xs text-[#878787] leading=[140%] line-clamp-3">
-                                          {details?.description}
+                                          {extractFirstParagraph(details?.description)}
                                         </p>
                                         <div className="flex justify-between items-center">
                                           <div className="text-xs">
@@ -1332,7 +1333,7 @@ const MentorDetails = () => {
                                           {pkg?.title}
                                         </div>
                                         <p className="text-xs text-gray-600 line-clamp-2">
-                                          {pkg?.description}
+                                          {extractFirstParagraph(pkg?.description)}
                                         </p>
                                         <div className="flex justify-between items-center">
                                           <div className="flex items-center gap-2">

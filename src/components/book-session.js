@@ -24,6 +24,7 @@ import { MdKeyboardArrowLeft } from "react-icons/md";
 import useFincraPayment from "@/lib/fincraCheckout";
 import { Load } from "./loading";
 import PaystackPop from "@paystack/inline-js";
+import { extractFirstParagraph } from "@/Utils/stringUtils";
 
 const BookSession = ({
   closeModal,
@@ -555,7 +556,7 @@ const BookSession = ({
                   {bookingData.title || "Let’s talk about negotiations"}
                 </h2>
                 <p className="font-regular text-[16px] leading-[20.8px] text-[#7D7D7D] pb-[8px]">
-                  {bookingData.description ||
+                  {extractFirstParagraph(bookingData.description) ||
                     "The booking description goes here in full with lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare."}
                 </p>
                 <button
