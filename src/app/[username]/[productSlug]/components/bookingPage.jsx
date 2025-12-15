@@ -227,7 +227,7 @@ const BookingPage = () => {
         console.error("Error fetching product:", err);
         setError(
           err.response?.data?.message ||
-            "Failed to load product. Please try again."
+          "Failed to load product. Please try again."
         );
       } finally {
         setLoading(false);
@@ -380,8 +380,8 @@ const BookingPage = () => {
       setMain(true);
       toast.error(
         error.response?.data?.error ||
-          error.response?.data?.message ||
-          "Payment initialization failed"
+        error.response?.data?.message ||
+        "Payment initialization failed"
       );
     }
   };
@@ -473,8 +473,8 @@ const BookingPage = () => {
       slotId: bookingValues?._id,
       userId: productData?.mentorId,
       suggestion: requestNote,
-      amount: values?.amount,
-      currency: values?.currency,
+      amount: values?.amount || productData.amount,
+      currency: values?.currency || productData.currency,
       ...values,
     };
 
@@ -515,8 +515,8 @@ const BookingPage = () => {
         setMain(true);
         toast.error(
           err.response?.data?.error ||
-            err.response?.data?.message ||
-            "Foreign payment failed"
+          err.response?.data?.message ||
+          "Foreign payment failed"
         );
       });
   };
@@ -772,37 +772,36 @@ const BookingPage = () => {
                 <div className="w-full h-full overflow-y-auto flex flex-col  border border-[#EAEAEA] bg-[#FAFAFA] rounded-2xl py-6 px-4">
                   {availableTimes.length > 0 ? (
                     <>
-                    <h3 className="font-medium text-[14px] text-[#344054] mb-4">
-                      Available Slots
-                    </h3>
-                    <div className="grid grid-cols-3 gap-3 mb-6">
-                      {availableTimes.map((time, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleTimeSelected(time, index)}
-                          className={`py-4 px-3 text-xs border rounded-lg transition-colors ${
-                            selectedTimeIndex === index
+                      <h3 className="font-medium text-[14px] text-[#344054] mb-4">
+                        Available Slots
+                      </h3>
+                      <div className="grid grid-cols-3 gap-3 mb-6">
+                        {availableTimes.map((time, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleTimeSelected(time, index)}
+                            className={`py-4 px-3 text-xs border rounded-lg transition-colors ${selectedTimeIndex === index
                               ? "bg-[#1453FF] text-[white] border-2 border-[#1453FF] shadow-[0_0_0_2px_#BEDBFF]"
                               : "bg-[white] text-[#344054] border-[#D0D5DD] hover:border-[#1453FF]"
-                          }`}
-                        >
-                          {time}
-                        </button>
-                      ))}
-                    </div>
+                              }`}
+                          >
+                            {time}
+                          </button>
+                        ))}
+                      </div>
 
-                    <div className="">
-                      <label className="block text-sm  text-[#344054] mb-2 ">
-                        Any special requests?
-                      </label>
-                      <textarea
-                        value={requestNote}
-                        onChange={handleChange}
-                        placeholder="Type here..."
-                        className="w-full h-24 p-3 border border-[#D0D5DD] rounded-lg text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#1453FF]"
-                      />
-                    </div>
-                  </>
+                      <div className="">
+                        <label className="block text-sm  text-[#344054] mb-2 ">
+                          Any special requests?
+                        </label>
+                        <textarea
+                          value={requestNote}
+                          onChange={handleChange}
+                          placeholder="Type here..."
+                          className="w-full h-24 p-3 border border-[#D0D5DD] rounded-lg text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#1453FF]"
+                        />
+                      </div>
+                    </>
                   ) : (
                     <p className="text-sm text-[#292D32] max-w-[213px] text-center flex items-center justify-center m-auto  h-full">Select a date to view the available time slots</p>
                   )}
@@ -819,11 +818,10 @@ const BookingPage = () => {
                   <button
                     onClick={() => openCheckout()}
                     disabled={selectedTimeIndex === null}
-                    className={`px-6 py-2 rounded-lg text-sm font-medium text-[white] transition-colors ${
-                      selectedTimeIndex !== null
-                        ? "bg-[#1453FF] hover:bg-blue-700"
-                        : "bg-gray-300 cursor-not-allowed"
-                    }`}
+                    className={`px-6 py-2 rounded-lg text-sm font-medium text-[white] transition-colors ${selectedTimeIndex !== null
+                      ? "bg-[#1453FF] hover:bg-blue-700"
+                      : "bg-gray-300 cursor-not-allowed"
+                      }`}
                   >
                     Make Payment
                   </button>
