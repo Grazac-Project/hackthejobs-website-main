@@ -386,6 +386,7 @@ const MentorDetails = () => {
     sessionType,
     category,
     slug,
+    pricing
   ) => {
     setBookingId(id);
     setBookType(type);
@@ -397,6 +398,7 @@ const MentorDetails = () => {
     setSessionType(sessionType);
     setCategory(category);
     setProductSlug(slug);
+    setProductPricing(pricing);
     // console.log(bookingId, bookType, mentorPrice, currency);
     setShowBookingModal(true);
 
@@ -529,6 +531,7 @@ const MentorDetails = () => {
         slot={slot}
         setSlot={setSlot}
         ProductSlug={productSlug}
+        productPricing={productPricing}
       />
     );
   }
@@ -596,6 +599,9 @@ const MentorDetails = () => {
                       setLoadingState={setLoader}
                       provider={provider}
                       bookingSlug={productSlug}
+                      productPricing={productPricing}
+                      setProductPrice={setProductPrice}
+                      setProductCurrency={setProductCurrency}
                     />
                   )}
                   {successModal && (
@@ -1201,6 +1207,7 @@ const MentorDetails = () => {
                                             null,
                                             '1-on-1 Session',
                                             details?.slug,
+                                            details?.pricing
                                           )
                                         }
                                       >
@@ -1301,7 +1308,8 @@ const MentorDetails = () => {
                                             pkg?.title,
                                             "mentorship",
                                             "Package",
-                                            pkg?.slug
+                                            pkg?.slug,
+                                            pkg?.pricing
                                           )
                                         }
                                       >
