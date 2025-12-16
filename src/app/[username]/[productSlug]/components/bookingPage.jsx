@@ -152,6 +152,21 @@ const BookingPage = () => {
           setProvider(response.data.data?.provider);
           let mappedData;
 
+          let displayAmount = apiData.amount || 0;
+          let displayCurrency = apiData.currency;
+          const pricingList = apiData.pricing || [];
+
+          if ((!displayAmount || Number(displayAmount) === 0) && pricingList.length > 0) {
+            const match = pricingList.find((p) => p.currency === displayCurrency);
+            if (match) {
+              displayAmount = match.amount;
+              displayCurrency = match.currency;
+            } else {
+              displayAmount = pricingList[0].amount;
+              displayCurrency = pricingList[0].currency;
+            }
+          }
+
           if (productType === "webinar") {
             // Map webinar response
             mappedData = {
@@ -164,8 +179,8 @@ const BookingPage = () => {
               startTime: apiData.startTime,
               endTime: apiData.endTime,
               location: apiData.meetLink || "Online",
-              amount: apiData.amount || 0,
-              currency: apiData.currency,
+              amount: displayAmount,
+              currency: displayCurrency,
               pricing: apiData.pricing || [],
               type: apiData.type, // "free" or "paid"
               category: "Webinar",
@@ -192,8 +207,8 @@ const BookingPage = () => {
                 : null,
               location: apiData.meetingLocation,
               timezone: apiData.timezone,
-              amount: apiData.amount || 0,
-              currency: apiData.currency,
+              amount: displayAmount,
+              currency: displayCurrency,
               pricing: apiData.pricing || [],
               type: apiData.bookingType, // "free" or "paid"
               category: "Booking",

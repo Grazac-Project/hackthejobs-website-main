@@ -1200,7 +1200,7 @@ const MentorDetails = () => {
                                             details?.title,
                                             null,
                                             '1-on-1 Session',
-                                            details?.slug
+                                            details?.slug,
                                           )
                                         }
                                       >
@@ -1272,88 +1272,105 @@ const MentorDetails = () => {
                               </h3>
                               <div className="grid md:grid-cols-1 grid-cols-2 gap-6">
                                 {mentorData?.packageMentorships?.map(
-                                  (pkg, idx) => (
-                                    <div
-                                      key={idx}
-                                      onClick={() =>
-                                        bookSession(
-                                          pkg?.bookingId,
-                                          pkg?.bookingType,
-                                          pkg?.amount,
-                                          pkg?.currency,
-                                          pkg?.description,
-                                          pkg?.title,
-                                          "mentorship",
-                                          'Package',
+                                  (pkg, idx) => {
+                                    const pricing = pkg?.pricing || [];
+                                    let amount = pkg?.amount;
+                                    let currency = pkg?.currency;
 
-                                        )
+                                    if ((!amount || Number(amount) === 0) && pricing.length > 0) {
+                                      const match = pricing.find((p) => p.currency === currency);
+                                      if (match) {
+                                        amount = match.amount;
+                                        currency = match.currency;
+                                      } else {
+                                        amount = pricing[0].amount;
+                                        currency = pricing[0].currency;
                                       }
-                                    >
+                                    }
+
+                                    return (
                                       <div
-                                        className="border border-[#EDEDED] h-[174px] border-t-4 shadow-sm hover:shadow-md rounded-md transition-shadow duration-200 cursor-pointer py-7 px-4 space-y-2"
-                                        style={{
-                                          borderTopColor:
-                                            groupColors[
-                                            idx % groupColors.length
-                                            ],
-                                        }}
+                                        key={idx}
+                                        onClick={() =>
+                                          bookSession(
+                                            pkg?.bookingId,
+                                            pkg?.bookingType,
+                                            amount,
+                                            currency,
+                                            pkg?.description,
+                                            pkg?.title,
+                                            "mentorship",
+                                            "Package",
+                                            pkg?.slug
+                                          )
+                                        }
                                       >
-                                        <div className="flex justify-between items-center">
-                                          <span
-                                            className="text-xs px-2 py-1 rounded-[32px] font-medium"
-                                            style={{
-                                              backgroundColor: `${groupColors[
-                                                idx % groupColors.length
-                                              ]
-                                                }1A`,
-                                              color:
-                                                groupColors[
-                                                idx % groupColors.length
-                                                ],
-                                            }}
-                                          >
-                                            {pkg?.packageDuration}{" "}
-                                            {pkg?.packageDuration > 1
-                                              ? "Weeks"
-                                              : "Week"}
-                                          </span>
-                                          {pkg?.bookingType.toLowerCase() ===
-                                            "paid" ? (
-                                            <div className="text-right text-sm font-semibold">
-                                              {getCurrencySymbol(pkg?.currency)}
-                                              {formatPrice(pkg?.amount)}
-                                            </div>
-                                          ) : (
-                                            <div className="text-right text-sm font-semibold">
-                                              Free
-                                            </div>
-                                          )}
-                                        </div>
-                                        <div className="font-semibold text-sm">
-                                          {pkg?.title}
-                                        </div>
-                                        <p className="text-xs text-gray-600 line-clamp-2">
-                                          {extractFirstParagraph(pkg?.description)}
-                                        </p>
-                                        <div className="flex justify-between items-center">
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-[#4F4F4F] text-[10px] leading-[140%]   ">
-                                              {pkg?.sessionDuration} Mins{" "}
+                                        <div
+                                          className="border border-[#EDEDED] h-[174px] border-t-4 shadow-sm hover:shadow-md rounded-md transition-shadow duration-200 cursor-pointer py-7 px-4 space-y-2"
+                                          style={{
+                                            borderTopColor:
+                                              groupColors[
+                                              idx % groupColors.length
+                                              ],
+                                          }}
+                                        >
+                                          <div className="flex justify-between items-center">
+                                            <span
+                                              className="text-xs px-2 py-1 rounded-[32px] font-medium"
+                                              style={{
+                                                backgroundColor: `${groupColors[
+                                                  idx % groupColors.length
+                                                ]
+                                                  }1A`,
+                                                color:
+                                                  groupColors[
+                                                  idx % groupColors.length
+                                                  ],
+                                              }}
+                                            >
+                                              {pkg?.packageDuration}{" "}
+                                              {pkg?.packageDuration > 1
+                                                ? "Weeks"
+                                                : "Week"}
                                             </span>
-                                            <span className=" w-2 h-2 bg-[#D9D9D9] rounded-full"></span>
-                                            <span className="text-[12px] leading-[140%] text-[#4F4F4F] ">
-                                              {duration(pkg?.sessionsPerWeek)} a
-                                              week
-                                            </span>
+                                            {pkg?.bookingType.toLowerCase() ===
+                                              "paid" ? (
+                                              <div className="text-right text-sm font-semibold">
+                                                {getCurrencySymbol(currency)}
+                                                {formatPrice(amount)}
+                                              </div>
+                                            ) : (
+                                              <div className="text-right text-sm font-semibold">
+                                                Free
+                                              </div>
+                                            )}
                                           </div>
-                                          <p className="text-sm text-primary font-medium flex items-center">
-                                            Book Session{" "}
-                                            <IoIosArrowRoundForward className="text-[16px] text-primary" />
+                                          <div className="font-semibold text-sm">
+                                            {pkg?.title}
+                                          </div>
+                                          <p className="text-xs text-gray-600 line-clamp-2">
+                                            {extractFirstParagraph(pkg?.description)}
                                           </p>
+                                          <div className="flex justify-between items-center">
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-[#4F4F4F] text-[10px] leading-[140%]   ">
+                                                {pkg?.sessionDuration} Mins{" "}
+                                              </span>
+                                              <span className=" w-2 h-2 bg-[#D9D9D9] rounded-full"></span>
+                                              <span className="text-[12px] leading-[140%] text-[#4F4F4F] ">
+                                                {duration(pkg?.sessionsPerWeek)} a
+                                                week
+                                              </span>
+                                            </div>
+                                            <p className="text-sm text-primary font-medium flex items-center">
+                                              Book Session{" "}
+                                              <IoIosArrowRoundForward className="text-[16px] text-primary" />
+                                            </p>
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                  )
+                                    );
+                                  }
                                 )}
                               </div>
                             </div>
