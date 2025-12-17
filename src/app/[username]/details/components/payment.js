@@ -48,6 +48,7 @@ const Payment = ({
   const [showCheckout, setShowCheckout] = useState(false);
   const router = useRouter();
 
+  const [viewMoreLoading, setViewMoreLoading] = useState(false);
 
   const [currentPrice, setCurrentPrice] = useState(productPrice);
   const [currentCurrency, setCurrentCurrency] = useState(productCurrency);
@@ -291,6 +292,18 @@ const Payment = ({
         : `${process.env.NEXT_PUBLIC_DASH_URL}/digital-products`;
   };
 
+  const handleViewMore = () => {
+    if (viewMoreLoading) return;
+
+    setViewMoreLoading(true);
+    router.push(`/${expertSlug}/${productSlug}`);
+  };
+
+  // function truncateString(str) {
+  //   if (typeof str !== "string") return "";
+  //   if (str.length <= 30) return str;
+  //   return str.slice(0, 30) + "...";
+  // }
   return (
     <div className="font-satoshi">
       {/* Overlay background */}
@@ -333,32 +346,32 @@ const Payment = ({
               </button>
               <span className="text-2xl font-semibold ml-4">Back</span>
             </div>
-{productType === "paid" && (
-            <select
-              className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
-              value={currentCurrency}
-              onChange={(e) => {
-                const selected = productPricing?.find((p) => p.currency === e.target.value);
-                if (selected) {
-                  setCurrentPrice(selected.amount);
-                  setCurrentCurrency(selected.currency);
-                } else if (!productPricing || productPricing.length === 0) {
-                  // Fallback if no pricing array, although logic implies we shouldn't be here if valid options are shown
-                  setCurrentCurrency(e.target.value)
-                }
-              }}
-            >
-              {productPricing && productPricing.length > 0 ? (
-                productPricing.map((price, index) => (
-                  <option key={index} value={price.currency}>
-                    {price.currency}
-                  </option>
-                ))
-              ) : (
-                <option value={productCurrency}>{productCurrency}</option>
-              )}
-            </select>
-          )}
+            {productType === "paid" && (
+              <select
+                className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+                value={currentCurrency}
+                onChange={(e) => {
+                  const selected = productPricing?.find((p) => p.currency === e.target.value);
+                  if (selected) {
+                    setCurrentPrice(selected.amount);
+                    setCurrentCurrency(selected.currency);
+                  } else if (!productPricing || productPricing.length === 0) {
+                    // Fallback if no pricing array, although logic implies we shouldn't be here if valid options are shown
+                    setCurrentCurrency(e.target.value)
+                  }
+                }}
+              >
+                {productPricing && productPricing.length > 0 ? (
+                  productPricing.map((price, index) => (
+                    <option key={index} value={price.currency}>
+                      {price.currency}
+                    </option>
+                  ))
+                ) : (
+                  <option value={productCurrency}>{productCurrency}</option>
+                )}
+              </select>
+            )}
           </div>
 
           {/* Product Details */}
@@ -390,14 +403,36 @@ const Payment = ({
               </div>
               <hr className="border border-[#EAEAEA] " />
 
-              <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] flex flex-col items-start h-[216px]">
-                {extractFirstParagraph(productDescription) || ""}
+              <div className="text-sm truncate font-normal tracking-[0.08em] mt-4 text-[#333333] flex flex-col items-start h-[216px]">
+                <p>
+                  {extractFirstParagraph(productDescription) || ""}
+                </p>
                 <button
+                  onClick={handleViewMore}
+                  disabled={viewMoreLoading}
+                  className={`mt-2 flex items-center gap-2 text-[14px] font-medium
+                  ${viewMoreLoading
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-[#1453FF] hover:underline"
+                    }`}>
+                  {viewMoreLoading && (
+                    <Image
+                      src="/loader.gif"
+                      width={14}
+                      height={14}
+                      alt="loading"
+                    />
+                  )}
+
+                  {viewMoreLoading ? "Loading..." : "View more"}
+                </button>
+
+                {/* <button
                   onClick={() => { router.push(`/${expertSlug}/${productSlug}`) }}
                   className="text-primary underline mt-[16px]"
                 >
                   View more
-                </button>
+                </button> */}
 
               </div>
               <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">

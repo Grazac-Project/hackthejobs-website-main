@@ -23,7 +23,7 @@ export default function EventCard({
   id,
 }) {
 
-  const displayPrice = price === "paid" ? `${getCurrencySymbol(currency)}${formatPrice(amount)}` : "Free";
+  const displayPrice = price?.toLowerCase() === "paid" ? `${getCurrencySymbol(currency)}${formatPrice(amount)}` : "Free";
   const attendeeText = !joinedLabel || joinedLabel === 0 ? "No attendee yet." : `${joinedLabel} ${joinedLabel === 1 ? "person has" : "people have"} joined already`;
 
   return (
@@ -53,15 +53,15 @@ export default function EventCard({
           <div className=" bg-blue-100  text-center text-[10px] font-bold  text-primary">
             {month
               ? new Date(month).toLocaleDateString("en-US", {
-                  month: "short",
-                })
+                month: "short",
+              })
               : ""}
           </div>
           <div className=" pt-1 text-center text-[14px] font-semibold leading-none text-[#000000]">
             {day
               ? new Date(month).toLocaleDateString("en-US", {
-                  day: "2-digit",
-                })
+                day: "2-digit",
+              })
               : ""}
           </div>
         </div>
@@ -83,7 +83,7 @@ export default function EventCard({
                 {/* {price === "paid"
                   ? `${getCurrencySymbol(currency)}${formatPrice(amount)}`
                   : price} */}
-                  {displayPrice}
+                {displayPrice}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -93,7 +93,7 @@ export default function EventCard({
                 {/* {joinedLabel === 0
                   ? "No attendee yet."
                   : `${joinedLabel} joined already`} */}
-                  {attendeeText}
+                {attendeeText}
               </span>
             </div>
           </div>

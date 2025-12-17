@@ -386,6 +386,7 @@ const MentorDetails = () => {
     sessionType,
     category,
     slug,
+    pricing
   ) => {
     setBookingId(id);
     setBookType(type);
@@ -397,6 +398,7 @@ const MentorDetails = () => {
     setSessionType(sessionType);
     setCategory(category);
     setProductSlug(slug);
+    setProductPricing(pricing);
     // console.log(bookingId, bookType, mentorPrice, currency);
     setShowBookingModal(true);
 
@@ -529,6 +531,7 @@ const MentorDetails = () => {
         slot={slot}
         setSlot={setSlot}
         ProductSlug={productSlug}
+        productPricing={productPricing}
       />
     );
   }
@@ -596,6 +599,9 @@ const MentorDetails = () => {
                       setLoadingState={setLoader}
                       provider={provider}
                       bookingSlug={productSlug}
+                      productPricing={productPricing}
+                      setProductPrice={setProductPrice}
+                      setProductCurrency={setProductCurrency}
                     />
                   )}
                   {successModal && (
@@ -1185,80 +1191,98 @@ const MentorDetails = () => {
                               </h3>
                               <div className="grid md:grid-cols-1 grid-cols-3 gap-6">
                                 {mentorData?.oneOnOneSessions?.map(
-                                  (details, i) => (
-                                    <div key={i}>
-                                      <div
-                                        className="border border-[#EDEDED] rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer h-[205px] py-7 px-4 space-y-2"
-                                        onClick={() =>
-                                          bookSession(
-                                            // details?._id,
-                                            details?.bookingId,
-                                            details?.bookingType,
-                                            details?.amount,
-                                            details?.currency,
-                                            details?.description,
-                                            details?.title,
-                                            null,
-                                            '1-on-1 Session',
-                                            details?.slug
-                                          )
-                                        }
-                                      >
-                                        <div className="flex gap-[16px] justify-between items-center mb-[10px] ">
-                                          <div
-                                            className={` h-[22px] px-3 rounded-full flex items-center justify-center ${details.bookingType === "Paid"
-                                              ? " bg-[#DEA8061A]"
-                                              : " bg-[#3333331A]"
-                                              }`}
-                                          >
-                                            {details.bookingType === "Paid" && (
-                                              <Image
-                                                src="/paid.svg"
-                                                alt="mentor"
-                                                width={12}
-                                                height={12}
-                                                className="w-[12px] h-[12px] rounded-full"
-                                              />
-                                            )}
-                                            <span
-                                              className={` text-[12px] font-medium leading-[18px] font-inter ${details?.bookingType === "Paid"
-                                                ? "text-[#F3B704]"
-                                                : "text-[#333333]"
-                                                } `}
+                                  (details, i) => {
+                                    const pricing = details?.pricing || [];
+                                    let amount = details?.amount;
+                                    let currency = details?.currency;
+
+                                    if ((!amount || Number(amount) === 0) && pricing.length > 0) {
+                                      const match = pricing.find((p) => p.currency === currency);
+                                      if (match) {
+                                        amount = match.amount;
+                                        currency = match.currency;
+                                      } else {
+                                        amount = pricing[0].amount;
+                                        currency = pricing[0].currency;
+                                      }
+                                    }
+
+                                    return (
+                                      <div key={i}>
+                                        <div
+                                          className="border border-[#EDEDED] rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer h-[205px] py-7 px-4 space-y-2"
+                                          onClick={() =>
+                                            bookSession(
+                                              // details?._id,
+                                              details?.bookingId,
+                                              details?.bookingType,
+                                              amount,
+                                              currency,
+                                              details?.description,
+                                              details?.title,
+                                              null,
+                                              '1-on-1 Session',
+                                              details?.slug,
+                                              details?.pricing
+                                            )
+                                          }
+                                        >
+                                          <div className="flex gap-[16px] justify-between items-center mb-[10px] ">
+                                            <div
+                                              className={` h-[22px] px-3 rounded-full flex items-center justify-center ${details.bookingType === "Paid"
+                                                ? " bg-[#DEA8061A]"
+                                                : " bg-[#3333331A]"
+                                                }`}
                                             >
-                                              {capitalizeFirstLetter(details?.bookingType)}
-                                            </span>
-                                          </div>
-                                          {details.bookingType === "Paid" && (
-                                            <div className=" flex items-center gap-1 justify-center">
-                                              <span className="text-[#333333] text-[14px] font-bold leading-[140%] font-inter ">
-                                                {getCurrencySymbol(
-                                                  details?.currency
-                                                )}
-                                                {formatPrice(details?.amount)}
+                                              {details.bookingType === "Paid" && (
+                                                <Image
+                                                  src="/paid.svg"
+                                                  alt="mentor"
+                                                  width={12}
+                                                  height={12}
+                                                  className="w-[12px] h-[12px] rounded-full"
+                                                />
+                                              )}
+                                              <span
+                                                className={` text-[12px] font-medium leading-[18px] font-inter ${details?.bookingType === "Paid"
+                                                  ? "text-[#F3B704]"
+                                                  : "text-[#333333]"
+                                                  } `}
+                                              >
+                                                {capitalizeFirstLetter(details?.bookingType)}
                                               </span>
                                             </div>
-                                          )}
-                                        </div>
-
-                                        <div className="font-bold font-inter text-[#333333] text-sm truncate">
-                                          {details?.title}
-                                        </div>
-                                        <p className="text-xs text-[#878787] leading=[140%] line-clamp-3">
-                                          {extractFirstParagraph(details?.description)}
-                                        </p>
-                                        <div className="flex justify-between items-center">
-                                          <div className="text-xs">
-                                            {details?.sessionDuration} Mins
+                                            {details.bookingType === "Paid" && (
+                                              <div className=" flex items-center gap-1 justify-center">
+                                                <span className="text-[#333333] text-[14px] font-bold leading-[140%] font-inter ">
+                                                  {getCurrencySymbol(
+                                                    currency
+                                                  )}
+                                                  {formatPrice(amount)}
+                                                </span>
+                                              </div>
+                                            )}
                                           </div>
-                                          <p className="text-sm text-primary font-medium flex items-center">
-                                            Book Session{" "}
-                                            <IoIosArrowRoundForward className="text-[16px] text-primary" />
+
+                                          <div className="font-bold font-inter text-[#333333] text-sm truncate">
+                                            {details?.title}
+                                          </div>
+                                          <p className="text-xs text-[#878787] leading=[140%] line-clamp-3">
+                                            {extractFirstParagraph(details?.description)}
                                           </p>
+                                          <div className="flex justify-between items-center">
+                                            <div className="text-xs">
+                                              {details?.sessionDuration} Mins
+                                            </div>
+                                            <p className="text-sm text-primary font-medium flex items-center">
+                                              Book Session{" "}
+                                              <IoIosArrowRoundForward className="text-[16px] text-primary" />
+                                            </p>
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                  )
+                                    )
+                                  }
                                 )}
                               </div>
                             </div>
@@ -1272,88 +1296,106 @@ const MentorDetails = () => {
                               </h3>
                               <div className="grid md:grid-cols-1 grid-cols-2 gap-6">
                                 {mentorData?.packageMentorships?.map(
-                                  (pkg, idx) => (
-                                    <div
-                                      key={idx}
-                                      onClick={() =>
-                                        bookSession(
-                                          pkg?.bookingId,
-                                          pkg?.bookingType,
-                                          pkg?.amount,
-                                          pkg?.currency,
-                                          pkg?.description,
-                                          pkg?.title,
-                                          "mentorship",
-                                          'Package',
+                                  (pkg, idx) => {
+                                    const pricing = pkg?.pricing || [];
+                                    let amount = pkg?.amount;
+                                    let currency = pkg?.currency;
 
-                                        )
+                                    if ((!amount || Number(amount) === 0) && pricing.length > 0) {
+                                      const match = pricing.find((p) => p.currency === currency);
+                                      if (match) {
+                                        amount = match.amount;
+                                        currency = match.currency;
+                                      } else {
+                                        amount = pricing[0].amount;
+                                        currency = pricing[0].currency;
                                       }
-                                    >
+                                    }
+
+                                    return (
                                       <div
-                                        className="border border-[#EDEDED] h-[174px] border-t-4 shadow-sm hover:shadow-md rounded-md transition-shadow duration-200 cursor-pointer py-7 px-4 space-y-2"
-                                        style={{
-                                          borderTopColor:
-                                            groupColors[
-                                            idx % groupColors.length
-                                            ],
-                                        }}
+                                        key={idx}
+                                        onClick={() =>
+                                          bookSession(
+                                            pkg?.bookingId,
+                                            pkg?.bookingType,
+                                            amount,
+                                            currency,
+                                            pkg?.description,
+                                            pkg?.title,
+                                            "mentorship",
+                                            "Package",
+                                            pkg?.slug,
+                                            pkg?.pricing
+                                          )
+                                        }
                                       >
-                                        <div className="flex justify-between items-center">
-                                          <span
-                                            className="text-xs px-2 py-1 rounded-[32px] font-medium"
-                                            style={{
-                                              backgroundColor: `${groupColors[
-                                                idx % groupColors.length
-                                              ]
-                                                }1A`,
-                                              color:
-                                                groupColors[
-                                                idx % groupColors.length
-                                                ],
-                                            }}
-                                          >
-                                            {pkg?.packageDuration}{" "}
-                                            {pkg?.packageDuration > 1
-                                              ? "Weeks"
-                                              : "Week"}
-                                          </span>
-                                          {pkg?.bookingType.toLowerCase() ===
-                                            "paid" ? (
-                                            <div className="text-right text-sm font-semibold">
-                                              {getCurrencySymbol(pkg?.currency)}
-                                              {formatPrice(pkg?.amount)}
-                                            </div>
-                                          ) : (
-                                            <div className="text-right text-sm font-semibold">
-                                              Free
-                                            </div>
-                                          )}
-                                        </div>
-                                        <div className="font-semibold text-sm">
-                                          {pkg?.title}
-                                        </div>
-                                        <p className="text-xs text-gray-600 line-clamp-2">
-                                          {extractFirstParagraph(pkg?.description)}
-                                        </p>
-                                        <div className="flex justify-between items-center">
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-[#4F4F4F] text-[10px] leading-[140%]   ">
-                                              {pkg?.sessionDuration} Mins{" "}
+                                        <div
+                                          className="border border-[#EDEDED] h-[174px] border-t-4 shadow-sm hover:shadow-md rounded-md transition-shadow duration-200 cursor-pointer py-7 px-4 space-y-2"
+                                          style={{
+                                            borderTopColor:
+                                              groupColors[
+                                              idx % groupColors.length
+                                              ],
+                                          }}
+                                        >
+                                          <div className="flex justify-between items-center">
+                                            <span
+                                              className="text-xs px-2 py-1 rounded-[32px] font-medium"
+                                              style={{
+                                                backgroundColor: `${groupColors[
+                                                  idx % groupColors.length
+                                                ]
+                                                  }1A`,
+                                                color:
+                                                  groupColors[
+                                                  idx % groupColors.length
+                                                  ],
+                                              }}
+                                            >
+                                              {pkg?.packageDuration}{" "}
+                                              {pkg?.packageDuration > 1
+                                                ? "Weeks"
+                                                : "Week"}
                                             </span>
-                                            <span className=" w-2 h-2 bg-[#D9D9D9] rounded-full"></span>
-                                            <span className="text-[12px] leading-[140%] text-[#4F4F4F] ">
-                                              {duration(pkg?.sessionsPerWeek)} a
-                                              week
-                                            </span>
+                                            {pkg?.bookingType.toLowerCase() ===
+                                              "paid" ? (
+                                              <div className="text-right text-sm font-semibold">
+                                                {getCurrencySymbol(currency)}
+                                                {formatPrice(amount)}
+                                              </div>
+                                            ) : (
+                                              <div className="text-right text-sm font-semibold">
+                                                Free
+                                              </div>
+                                            )}
                                           </div>
-                                          <p className="text-sm text-primary font-medium flex items-center">
-                                            Book Session{" "}
-                                            <IoIosArrowRoundForward className="text-[16px] text-primary" />
+                                          <div className="font-semibold text-sm">
+                                            {pkg?.title}
+                                          </div>
+                                          <p className="text-xs text-gray-600 line-clamp-2">
+                                            {extractFirstParagraph(pkg?.description)}
                                           </p>
+                                          <div className="flex justify-between items-center">
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-[#4F4F4F] text-[10px] leading-[140%]   ">
+                                                {pkg?.sessionDuration} Mins{" "}
+                                              </span>
+                                              <span className=" w-2 h-2 bg-[#D9D9D9] rounded-full"></span>
+                                              <span className="text-[12px] leading-[140%] text-[#4F4F4F] ">
+                                                {duration(pkg?.sessionsPerWeek)} a
+                                                week
+                                              </span>
+                                            </div>
+                                            <p className="text-sm text-primary font-medium flex items-center">
+                                              Book Session{" "}
+                                              <IoIosArrowRoundForward className="text-[16px] text-primary" />
+                                            </p>
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                  )
+                                    );
+                                  }
                                 )}
                               </div>
                             </div>
@@ -1365,23 +1407,41 @@ const MentorDetails = () => {
                                 Webinar
                               </h3>
                               <div className="grid md:grid-cols-1 grid-cols-3 gap-6">
-                                {mentorData?.webinars?.map((webinar, id) => (
-                                  <EventCard
-                                    title={webinar?.title}
-                                    month={webinar?.startDate}
-                                    day={webinar?.startDate}
-                                    venue="Google Meet"
-                                    price={webinar?.type}
-                                    joinedLabel={
-                                      webinar?.guestAttendees?.length
+                                {mentorData?.webinars?.map((webinar, id) => {
+                                  const pricing = webinar?.pricing || [];
+                                  let amount = webinar?.amount;
+                                  let currency = webinar?.currency;
+
+                                  if ((!amount || Number(amount) === 0) && pricing.length > 0) {
+                                    const match = pricing.find((p) => p.currency === currency);
+                                    if (match) {
+                                      amount = match.amount;
+                                      currency = match.currency;
+                                    } else {
+                                      amount = pricing[0].amount;
+                                      currency = pricing[0].currency;
                                     }
-                                    image={webinar.thumbnail}
-                                    currency={webinar.currency}
-                                    amount={webinar.amount}
-                                    key={id}
-                                    action={() => AttendWebinar(webinar._id, webinar?.slug)}
-                                  />
-                                ))}
+                                  }
+
+                                  return (
+                                    <EventCard
+                                      title={webinar?.title}
+                                      month={webinar?.startDate}
+                                      day={webinar?.startDate}
+                                      venue="Google Meet"
+                                      price={webinar?.type}
+                                      joinedLabel={
+                                        webinar?.guestAttendees?.length
+                                      }
+                                      image={webinar.thumbnail}
+                                      currency={currency}
+                                      amount={amount}
+                                      key={id}
+                                      action={() => AttendWebinar(webinar._id, webinar?.slug)}
+                                    />
+                                  )
+                                }
+                                )}
                               </div>
                             </div>
                           )}
@@ -1427,6 +1487,7 @@ const MentorDetails = () => {
           checkoutCallback={checkoutCallback}
           productId={productId}
           productDescription={productDescription}
+          productTitle={productTitle}
           productPrice={productPrice}
           productCurrency={productCurrency}
           productType={productType || bookType}

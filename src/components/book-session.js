@@ -25,6 +25,8 @@ import useFincraPayment from "@/lib/fincraCheckout";
 import { Load } from "./loading";
 import PaystackPop from "@paystack/inline-js";
 import { extractFirstParagraph } from "@/Utils/stringUtils";
+import { formatPrice } from "@/Utils/price-formater";
+import { getCurrencySymbol } from "@/Utils/currency-formatter";
 
 const BookSession = ({
   closeModal,
@@ -45,6 +47,9 @@ const BookSession = ({
   setLoadingState,
   provider,
   bookingSlug,
+  productPricing,
+  setProductPrice,
+  setProductCurrency,
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -67,6 +72,33 @@ const BookSession = ({
   const [clickedDate, setClickedDate] = useState("");
   const [ref, setRef] = useState("");
   const { startPayment } = useFincraPayment();
+  const [currentPrice, setCurrentPrice] = useState(price);
+  const [currentCurrency, setCurrentCurrency] = useState(bookingCurrency);
+  const [viewMoreLoading, setViewMoreLoading] = useState(false);
+
+
+  useEffect(() => {
+    setCurrentPrice(price);
+    setCurrentCurrency(bookingCurrency);
+  }, [price, bookingCurrency]);
+
+  const handleCurrencyChange = (e) => {
+    const selectedCurrency = e.target.value;
+    const pricingOption = productPricing?.find(
+      (p) => p.currency === selectedCurrency
+    );
+
+    if (pricingOption) {
+      setCurrentCurrency(selectedCurrency);
+      setCurrentPrice(pricingOption.amount);
+      if (setProductCurrency) setProductCurrency(selectedCurrency);
+      if (setProductPrice) setProductPrice(pricingOption.amount);
+    } else {
+      setCurrentCurrency(selectedCurrency);
+      if (setProductCurrency) setProductCurrency(selectedCurrency);
+    }
+  };
+
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
@@ -269,7 +301,9 @@ const BookSession = ({
 
       setLoading(false);
       setLoadingState(false);
-      if (bookingCurrency.toUpperCase() === "NGN") {
+      setLoading(false);
+      setLoadingState(false);
+      if (currentCurrency.toUpperCase() === "NGN") {
         if (provider === "paystack") {
           console.log(payload);
           console.log("Payment via Paystack selected");
@@ -308,8 +342,8 @@ const BookSession = ({
         }
 
         await startPayment({
-          price: Number(price),
-          currency: String(bookingCurrency).toUpperCase(),
+          price: Number(currentPrice),
+          currency: String(currentCurrency).toUpperCase(),
           ref: reference,
           nameProp: fullname,
           emailProp: email,
@@ -347,7 +381,7 @@ const BookSession = ({
         bookingId: slot?.bookingId,
         slotId: slot?.slotId,
         // suggestion: values.suggestion,
-        currency: bookingCurrency,
+        currency: currentCurrency,
         ...x,
       };
 
@@ -401,8 +435,8 @@ const BookSession = ({
       }
 
       await startPayment({
-        price: Number(price),
-        currency: String(bookingCurrency).toUpperCase(),
+        price: Number(currentPrice),
+        currency: String(currentCurrency).toUpperCase(),
         ref: reference,
         nameProp: fullname,
         emailProp: email,
@@ -433,8 +467,8 @@ const BookSession = ({
       slotId: slot?.slotId,
       userId: mentorId,
       // suggestion: values.suggestion,
-      amount: price,
-      currency: bookingCurrency,
+      amount: currentPrice,
+      currency: currentCurrency,
       ...x,
     };
     // fincraPayment(data, token)
@@ -477,13 +511,13 @@ const BookSession = ({
     } else if (
       type &&
       type.toLowerCase() === "paid" &&
-      bookingCurrency === "NGN"
+      currentCurrency === "NGN"
     ) {
       handlePayment(val);
     } else if (
       type &&
       type.toLowerCase() === "paid" &&
-      bookingCurrency !== "NGN"
+      currentCurrency !== "NGN"
     ) {
       handleForeignPayment(val);
     } else {
@@ -497,7 +531,20 @@ const BookSession = ({
         (...args) =>
           handleclick(...args)
     );
-  }, [slot]);
+  }, [slot, currentPrice, currentCurrency]);
+
+  const handleViewMore = () => {
+    if (viewMoreLoading) return;
+
+    setViewMoreLoading(true);
+    router.push(`${pathname}/${bookingSlug}`);
+  };
+
+// function truncateString(str) {
+//     if (typeof str !== "string") return "";
+//     if (str.length <= 30) return str;
+//     return str.slice(0, 30) + "...";
+//   }
 
   return (
     <div>
@@ -528,18 +575,36 @@ const BookSession = ({
             </button>
           </div>
         ) : (
-          <div className="h-full bg-[#fff] w-full max-w-[629px] md:max-w-full p-8 sm:p-3 pb-[277px] sm:pb-[41px] overflow-y-auto flex flex-col fixed top-0 right-0 z-50">
+          <div className="h-full bg-[#fff] w-full max-w-[629px] md:max-w-full p-8 sm:p-3 pb-[277px] sm:pb-[41px] overflow-y-auto flex flex-col fixed top-0 right-0 z-50 xm:pb-[100px]">
 
-            <div className="pb-[40px] flex gap-[16px] items-center">
-              <div
-                className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
-                onClick={closeModal}
-              >
-                <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
+            <div className="flex items-center justify-between pb-[40px]">
+              <div className="flex gap-[16px] items-center">
+                <div
+                  className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
+                  onClick={closeModal}
+                >
+                  <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
+                </div>
+                <h1 className="font-medium text-[18px] leading-[27px] tracking-[3%] text-[#121927]">
+                  Book Session
+                </h1>
               </div>
-              <h1 className="font-medium text-[18px] leading-[27px] tracking-[3%] text-[#121927]">
-                Book Session
-              </h1>
+
+              <select
+                className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+                value={currentCurrency}
+                onChange={handleCurrencyChange}
+              >
+                {productPricing && productPricing.length > 0 ? (
+                  productPricing.map((pricing, index) => (
+                    <option key={index} value={pricing.currency}>
+                      {pricing.currency}
+                    </option>
+                  ))
+                ) : (
+                  <option value={currentCurrency}>{currentCurrency}</option>
+                )}
+              </select>
             </div>
             {loader ? (
               <Load />
@@ -556,15 +621,33 @@ const BookSession = ({
                   {bookingData.title || "Let’s talk about negotiations"}
                 </h2>
                 <p className="font-regular text-[16px] leading-[20.8px] text-[#7D7D7D] pb-[8px]">
+                  
                   {extractFirstParagraph(bookingData.description) ||
                     "The booking description goes here in full with lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare."}
                 </p>
                 <button
+                  onClick={handleViewMore}
+                  disabled={viewMoreLoading}
+                  className={`mb-6 flex items-center gap-2 text-[14px] font-medium
+                   ${viewMoreLoading ? "text-[#1453FF] cursor-not-allowed" : "text-[#1453FF] hover:underline"}`}>
+                  {viewMoreLoading && (
+                    <Image
+                      src="/loader.gif"
+                      width={14}
+                      height={14}
+                      alt="loading"
+                    />
+                  )}
+
+                  {viewMoreLoading ? "Loading..." : "View more"}
+                </button>
+
+                {/* <button
                   onClick={() => router.push(`${pathname}/${bookingSlug}`)}
                   className="mb-6 text-[#1453FF] text-[14px] font-medium hover:underline"
                 >
                   View more
-                </button>
+                </button> */}
                 <div className="flex justify-between items-center">
                   <div className=" xxm:w-fit">
                     <h3 className="font-medium text-[16px] text-[#4F4F4F] leading-[19.2px] mb-[8px]">
@@ -633,7 +716,7 @@ const BookSession = ({
                           );
                         })}
                       </div>
-                      <div className="w-[100%] mt-[40px]">
+                      <div className="w-[100%] mt-[40px] xm:mb-[40px]">
                         <h4 className="text-[14px] leading-[17px] font-[400] text-[#4F4F4F] mb-[8px] sm:mt-[12px]">
                           Do you have anything you'd like to share ahead of our
                           session ?{" "}
@@ -652,22 +735,30 @@ const BookSession = ({
                   )}
                 </div>
                 {showButton && (
-                  <button
-                    onClick={handleShowCheckout}
-                    className="font-medium w-[100%] flex justify-center items-center gap-1 text-[14px] leading-[19.6px] tracking-[2%] text-[#fff] bg-[#1453FF] border-[1px] border-[#1453FF] py-[12px] px-[20px] rounded-[8px] sm:flex mb-[16px] mt-[24px]"
-                  >
-                    {loading ? (
-                      <Image
-                        src="/loader.gif"
-                        width={16}
-                        height={16}
-                        alt="loader"
-                      />
-                    ) : (
-                      ""
-                    )}
-                    {buttonText}
-                  </button>
+                  <div className="flex items-center justify-between border border-[#EAEAEA] bg-[#FAFAFA] rounded-[8px] px-[20px] py-[5px] mt-[20px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:px-[20px]">
+                    <div>
+                      <span className="text-lg font-bold text-[#101828]">
+                        {getCurrencySymbol(currentCurrency)}
+                        {formatPrice(currentPrice)}
+                      </span>
+                    </div>
+                    <button
+                      onClick={handleShowCheckout}
+                      className="font-medium flex justify-center items-center gap-1 text-[14px] leading-[19.6px] tracking-[2%] text-[#fff] bg-[#1453FF] border-[1px] border-[#1453FF] py-[12px] px-[20px] rounded-[8px] sm:flex mb-[16px] mt-[24px]"
+                    >
+                      {loading ? (
+                        <Image
+                          src="/loader.gif"
+                          width={16}
+                          height={16}
+                          alt="loader"
+                        />
+                      ) : (
+                        ""
+                      )}
+                      {buttonText}
+                    </button>
+                  </div>
                 )}
               </div>
             )}
