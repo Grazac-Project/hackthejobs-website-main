@@ -76,7 +76,16 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
     setLoading(true);
     getSingleWebinar(webinarId, token)
       .then((res) => {
-        setWebData(res.data?.data?.webinar);
+        let webinar = res.data?.data?.webinar;
+        if (webinar && (webinar.amount === 0 || !webinar.amount) && webinar.pricing?.length > 0) {
+          const firstPrice = webinar.pricing[0];
+          webinar = {
+            ...webinar,
+            amount: firstPrice.amount,
+            currency: firstPrice.currency,
+          };
+        }
+        setWebData(webinar);
         setLoading(false);
       })
       .catch((err) => {
@@ -97,7 +106,7 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
   //     document.body.style.overflow = prevBodyOverflow;
   //   };
   // }, []);
-  console.log({ link });
+  // console.log({ link });
   const startsAt = webData?.startTime;
 
   const { days, hours, minutes, seconds, finished } = useCountdown(startsAt);
