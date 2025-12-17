@@ -74,6 +74,8 @@ const BookSession = ({
   const { startPayment } = useFincraPayment();
   const [currentPrice, setCurrentPrice] = useState(price);
   const [currentCurrency, setCurrentCurrency] = useState(bookingCurrency);
+  const [viewMoreLoading, setViewMoreLoading] = useState(false);
+
 
   useEffect(() => {
     setCurrentPrice(price);
@@ -531,6 +533,14 @@ const BookSession = ({
     );
   }, [slot, currentPrice, currentCurrency]);
 
+  const handleViewMore = () => {
+    if (viewMoreLoading) return;
+
+    setViewMoreLoading(true);
+    router.push(`${pathname}/${bookingSlug}`);
+  };
+
+
   return (
     <div>
       {/* <ToastContainer /> */}
@@ -560,7 +570,7 @@ const BookSession = ({
             </button>
           </div>
         ) : (
-          <div className="h-full bg-[#fff] w-full max-w-[629px] md:max-w-full p-8 sm:p-3 pb-[277px] sm:pb-[41px] overflow-y-auto flex flex-col fixed top-0 right-0 z-50">
+          <div className="h-full bg-[#fff] w-full max-w-[629px] md:max-w-full p-8 sm:p-3 pb-[277px] sm:pb-[41px] overflow-y-auto flex flex-col fixed top-0 right-0 z-50 xm:pb-[100px]">
 
             <div className="flex items-center justify-between pb-[40px]">
               <div className="flex gap-[16px] items-center">
@@ -610,11 +620,28 @@ const BookSession = ({
                     "The booking description goes here in full with lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare."}
                 </p>
                 <button
+                  onClick={handleViewMore}
+                  disabled={viewMoreLoading}
+                  className={`mb-6 flex items-center gap-2 text-[14px] font-medium
+                   ${viewMoreLoading ? "text-[#1453FF] cursor-not-allowed" : "text-[#1453FF] hover:underline"}`}>
+                  {viewMoreLoading && (
+                    <Image
+                      src="/loader.gif"
+                      width={14}
+                      height={14}
+                      alt="loading"
+                    />
+                  )}
+
+                  {viewMoreLoading ? "Loading..." : "View more"}
+                </button>
+
+                {/* <button
                   onClick={() => router.push(`${pathname}/${bookingSlug}`)}
                   className="mb-6 text-[#1453FF] text-[14px] font-medium hover:underline"
                 >
                   View more
-                </button>
+                </button> */}
                 <div className="flex justify-between items-center">
                   <div className=" xxm:w-fit">
                     <h3 className="font-medium text-[16px] text-[#4F4F4F] leading-[19.2px] mb-[8px]">
@@ -683,7 +710,7 @@ const BookSession = ({
                           );
                         })}
                       </div>
-                      <div className="w-[100%] mt-[40px]">
+                      <div className="w-[100%] mt-[40px] xm:mb-[40px]">
                         <h4 className="text-[14px] leading-[17px] font-[400] text-[#4F4F4F] mb-[8px] sm:mt-[12px]">
                           Do you have anything you'd like to share ahead of our
                           session ?{" "}
@@ -702,7 +729,7 @@ const BookSession = ({
                   )}
                 </div>
                 {showButton && (
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between border border-[#EAEAEA] bg-[#FAFAFA] rounded-[8px] px-[20px] py-[5px] mt-[20px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:px-[20px]">
                     <div>
                       <span className="text-lg font-bold text-[#101828]">
                         {getCurrencySymbol(currentCurrency)}

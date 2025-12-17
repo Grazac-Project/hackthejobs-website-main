@@ -48,6 +48,7 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
   const [submit, setSubmit] = useState(false);
   const { startPayment } = useFincraPayment();
   const [success, setSuccess] = useState(false);
+  const [viewMoreLoading, setViewMoreLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     firstName: "",
     lastName: "",
@@ -265,6 +266,14 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleViewMore = () => {
+    if (viewMoreLoading) return;
+
+    setViewMoreLoading(true);
+    router.push(link);
+  };
+
+
   return (
     <div>
       <div
@@ -309,24 +318,24 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
                 value={webData?.currency}
                 onChange={(e) => {
                   const selectedCurrency = e.target.value;
-                const pricingOption = webData?.pricing?.find(
-                  (p) => p.currency === selectedCurrency
-                );
-                if (pricingOption) {
-                  setWebData((prev) => ({
-                    ...prev,
-                    amount: pricingOption.amount,
-                    currency: pricingOption.currency,
-                  }));
-                }
-              }}
-            >
-              {webData?.pricing?.map((price) => (
-                <option key={price._id} value={price.currency}>
-                  {price.currency}
-                </option>
-              ))}
-            </select>
+                  const pricingOption = webData?.pricing?.find(
+                    (p) => p.currency === selectedCurrency
+                  );
+                  if (pricingOption) {
+                    setWebData((prev) => ({
+                      ...prev,
+                      amount: pricingOption.amount,
+                      currency: pricingOption.currency,
+                    }));
+                  }
+                }}
+              >
+                {webData?.pricing?.map((price) => (
+                  <option key={price._id} value={price.currency}>
+                    {price.currency}
+                  </option>
+                ))}
+              </select>
             )}
 
           </div>
@@ -355,13 +364,32 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
                   <p className="mt-3 text-[#787878] text-[14px] line-clamp-3">
                     {extractFirstParagraph(webData?.description)}
                   </p>
-
                   <button
+                    onClick={handleViewMore}
+                    // disabled={viewMoreLoading}
+                    className={`mt-2 flex items-center gap-2 text-[14px] font-medium
+                     ${viewMoreLoading
+                        ? "text-gray-400 cursor-not-allowed"
+                        : "text-[#1453FF] hover:underline"
+                      }`}>
+                    {viewMoreLoading && (
+                      <Image
+                        src="/loader.gif"
+                        width={14}
+                        height={14}
+                        alt="loading"
+                      />
+                    )}
+
+                    {viewMoreLoading ? "Loading..." : "View more"}
+                  </button>
+
+                  {/* <button
                     onClick={() => router.push(link)}
                     className="mt-2 text-[#1453FF] text-[14px] font-medium hover:underline"
                   >
                     View more
-                  </button>
+                  </button> */}
                 </div>
 
                 {/* Event Details Card */}
@@ -379,14 +407,14 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
                       <p className="text-[14px] font-medium text-[#000000]">
                         {webData?.date
                           ? new Date(webData?.date).toLocaleDateString(
-                              "en-US",
-                              {
-                                weekday: "long",
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              }
-                            )
+                            "en-US",
+                            {
+                              weekday: "long",
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )
                           : ""}
                       </p>
                       <p className="text-[12px] text-[#787878] mt-1">
@@ -441,24 +469,24 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
                       <p className="text-[14px] font-medium text-[#000000]">
                         {webData?.startTime
                           ? new Date(webData?.startTime).toLocaleTimeString(
-                              "en-US",
-                              {
-                                hour: "numeric",
-                                minute: "2-digit",
-                                hour12: true,
-                              }
-                            )
+                            "en-US",
+                            {
+                              hour: "numeric",
+                              minute: "2-digit",
+                              hour12: true,
+                            }
+                          )
                           : ""}{" "}
                         -{" "}
                         {webData?.endTime
                           ? new Date(webData?.endTime).toLocaleTimeString(
-                              "en-US",
-                              {
-                                hour: "numeric",
-                                minute: "2-digit",
-                                hour12: true,
-                              }
-                            )
+                            "en-US",
+                            {
+                              hour: "numeric",
+                              minute: "2-digit",
+                              hour12: true,
+                            }
+                          )
                           : ""}
                       </p>
                       <p className="text-[12px] text-[#787878] mt-1">
@@ -472,8 +500,8 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
                   <div className="text-[24px] font-semibold text-[#000000]">
                     {webData?.type !== "free"
                       ? `${getCurrencySymbol(webData?.currency)}${formatPrice(
-                          webData?.amount
-                        )}`
+                        webData?.amount
+                      )}`
                       : "Free"}
                   </div>
                   <button
@@ -483,10 +511,10 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
                     {finished
                       ? "Event Closed"
                       : webData?.type === "free"
-                      ? "Join Webinar"
-                      : submit
-                      ? "Redirecting.."
-                      : "Make Payment"}
+                        ? "Join Webinar"
+                        : submit
+                          ? "Redirecting.."
+                          : "Make Payment"}
                   </button>
                 </div>
               </div>
