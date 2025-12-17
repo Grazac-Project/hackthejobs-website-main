@@ -223,7 +223,7 @@ const WebinarPage = () => {
         setError("");
 
         const response = await getProductBySlug(username, productSlug);
-        
+
         if (response.data && response.data.data && response.data.data.data) {
           const apiData = response.data.data.data;
           console.log(apiData, "response");
@@ -231,7 +231,7 @@ const WebinarPage = () => {
           const productType = response.data.data.type; // "booking" or "webinar"
           setProvider(response.data.data?.provider);
           let mappedData;
-          
+
           if (productType === "webinar") {
             // Map webinar response
             mappedData = {
@@ -244,8 +244,27 @@ const WebinarPage = () => {
               startTime: apiData.startTime,
               endTime: apiData.endTime,
               location: apiData.meetLink || "Online",
-              amount: apiData.amount || 0,
-              currency: apiData.currency,
+              amount: (() => {
+                if (apiData.amount > 0) return apiData.amount;
+                // If amount is 0, check pricing
+                if (apiData.pricing && apiData.pricing.length > 0) {
+                  const match = apiData.pricing.find(
+                    (p) => p.currency === apiData.currency
+                  );
+                  return match ? match.amount : apiData.pricing[0].amount;
+                }
+                return 0;
+              })(),
+              currency: (() => {
+                // Check if need to fallback currency
+                if ((!apiData.amount || apiData.amount === 0) && apiData.pricing && apiData.pricing.length > 0) {
+                  const match = apiData.pricing.find(
+                    (p) => p.currency === apiData.currency
+                  );
+                  return match ? apiData.currency : apiData.pricing[0].currency;
+                }
+                return apiData.currency;
+              })(),
               type: apiData.type, // "free" or "paid"
               category: "Webinar",
               fullDescription: apiData.description,
@@ -270,15 +289,32 @@ const WebinarPage = () => {
                 ? `${apiData.availabilitySlots[0].date}T${apiData.availabilitySlots[0].endTime}:00Z`
                 : null,
               location: apiData.meetingLocation,
-              amount: apiData.amount || 0,
-              currency: apiData.currency,
+              amount: (() => {
+                if (apiData.amount > 0) return apiData.amount;
+                if (apiData.pricing && apiData.pricing.length > 0) {
+                  const match = apiData.pricing.find(
+                    (p) => p.currency === apiData.currency
+                  );
+                  return match ? match.amount : apiData.pricing[0].amount;
+                }
+                return 0;
+              })(),
+              currency: (() => {
+                if ((!apiData.amount || apiData.amount === 0) && apiData.pricing && apiData.pricing.length > 0) {
+                  const match = apiData.pricing.find(
+                    (p) => p.currency === apiData.currency
+                  );
+                  return match ? apiData.currency : apiData.pricing[0].currency;
+                }
+                return apiData.currency;
+              })(),
               type: apiData.bookingType, // "free" or "paid"
               category: "Booking",
               fullDescription: apiData.description,
               availabilitySlots: apiData.availabilitySlots || [],
               sessionDuration: apiData.sessionDuration,
               _id: apiData._id,
-              productType: "booking", 
+              productType: "booking",
               pricing: apiData.pricing,
             };
           } else {
@@ -317,7 +353,7 @@ const WebinarPage = () => {
   if (error || !productData) {
     return (
       <>
-      <Error text={error || "Product not found"} path={`/${username}`} />
+        <Error text={error || "Product not found"} path={`/${username}`} />
       </>
     );
   }
@@ -382,7 +418,7 @@ const WebinarPage = () => {
 
               <select
                 className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
-               value={productData?.currency}
+                value={productData?.currency}
                 onChange={(e) => {
                   const selectedCurrency = e.target.value;
                   const pricingOption = productData?.pricing?.find(

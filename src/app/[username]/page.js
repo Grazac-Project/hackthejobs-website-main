@@ -628,6 +628,18 @@ const MentorDetails = () => {
                       token={token}
                       provider={provider}
                       link={link}
+                      setCheckout={setCheckout}
+                      setShowMain={setShowMain}
+                      setCheckoutCallback={setCheckoutCallback}
+                      setProductId={setProductId}
+                      setProductTitle={setProductTitle}
+                      setProductPrice={setProductPrice}
+                      setProductCurrency={setProductCurrency}
+                      setCategory={setCategory}
+                      setBookType={setBookType}
+                      setProductDescription={setProductDescription}
+                      setLoader={setLoader}
+                      successPaymentModal={() => setSuccessPaymentModal(true)}
                     />
                   )}
 

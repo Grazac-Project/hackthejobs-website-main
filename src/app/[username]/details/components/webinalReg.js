@@ -41,7 +41,25 @@ function useCountdown(targetDate) {
   return { days, hours, minutes, seconds, finished: totalSeconds === 0 };
 }
 
-const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
+const WebinarModal = ({
+  webinarId,
+  token,
+  provider,
+  onClick,
+  link,
+  setCheckout,
+  setShowMain,
+  setCheckoutCallback,
+  setProductId,
+  setProductTitle,
+  setProductPrice,
+  setProductCurrency,
+  setCategory,
+  setBookType,
+  setProductDescription,
+  setLoader,
+  successPaymentModal
+}) => {
   const [webData, setWebData] = useState({});
   const [singleWebData, setSingleWebData] = useState({});
   const [loading, setLoading] = useState(false);
@@ -76,7 +94,16 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
     setLoading(true);
     getSingleWebinar(webinarId, token)
       .then((res) => {
-        setWebData(res.data?.data?.webinar);
+        let webinar = res.data?.data?.webinar;
+        if (webinar && (webinar.amount === 0 || !webinar.amount) && webinar.pricing?.length > 0) {
+          const firstPrice = webinar.pricing[0];
+          webinar = {
+            ...webinar,
+            amount: firstPrice.amount,
+            currency: firstPrice.currency,
+          };
+        }
+        setWebData(webinar);
         setLoading(false);
       })
       .catch((err) => {
@@ -97,7 +124,7 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
   //     document.body.style.overflow = prevBodyOverflow;
   //   };
   // }, []);
-  console.log({ link });
+  // console.log({ link });
   const startsAt = webData?.startTime;
 
   const { days, hours, minutes, seconds, finished } = useCountdown(startsAt);
@@ -130,29 +157,39 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
       setSubmit(false);
     }
   };
-  const handlePayment = async (e) => {
-    e.preventDefault();
+  const executePayment = async (values) => {
     try {
       const data = {
         webinarId: webData._id,
-        firstName: formValues.firstName,
-        lastName: formValues.lastName,
-        email: formValues.email,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
         currency: webData.currency,
       };
-      setSubmit(true);
+
+      // Handle Foreign Payment (Non-NGN)
+      if (webData?.currency && webData?.currency.toUpperCase() !== "NGN") {
+        fincraWebinarCheckoutData(data, token)
+          .then((res) => {
+            setLoader(false);
+            const url = res.data.data.redirectUrl;
+            window.location.href = url;
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error(err.response?.data?.message || "Something went wrong");
+            setLoader(false);
+          });
+        return;
+      }
+
+      // Handle NGN Payment
       let reference;
       try {
         const res = await fincraWebinarCheckoutData(data, token);
 
         if (provider === "paystack") {
           console.log(res?.data?.data?.paystack);
-          console.log("Payment via Paystack selected");
-          console.log(
-            "Payment Data:",
-            res?.data?.data?.data?.paystack?.access_code
-          );
-
           const accessCode = res?.data?.data?.data?.paystack?.access_code;
 
           if (accessCode) {
@@ -161,21 +198,20 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
             popup.resumeTransaction(accessCode, {
               onCancel: () => {
                 console.log("this is being cancelled...");
+                setLoader(false);
               },
               onError: () => {
                 console.log(" error");
+                setLoader(false);
               },
               onLoad: () => {
                 console.log("this is being loaded..");
               },
               onSuccess: () => {
                 setShowMain(true);
-                setShowModal(false);
                 setCheckout(false);
                 setLoader(false);
-                // setIsSuccess(true);
                 successPaymentModal();
-                setLoading("Make Payment");
               },
             });
             return;
@@ -186,58 +222,55 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
         // console.log("reference", reference);
       } catch (err) {
         console.log(err);
-
         toast.error(
           err.response?.data?.message || "An error occurred. Please try again."
         );
-        setSubmit(false);
+        setLoader(false);
         return;
       }
-      const fullname = `${formValues.firstName} ${formValues.lastName}`;
+
+      const fullname = `${values.firstName} ${values.lastName}`;
       const result = await startPayment({
         price: webData.amount,
         currency: webData.currency,
         ref: reference,
         nameProp: fullname,
-        emailProp: formValues.email,
+        emailProp: values.email,
         onSuccess: (data) => {
-          setSuccess(true);
-          const url = new URL(window.location.href);
-          url.searchParams.set("ref", reference);
-          window.history.replaceState({}, "", url.toString());
+          setShowMain(true);
+          setCheckout(false);
+          setLoader(false);
+          successPaymentModal();
         },
         onClose: () => {
           toast.error("Transaction was not completed, window closed.");
+          setLoader(false);
         },
       });
     } catch (err) {
       console.error(err);
-      setSubmit(false);
+      setLoader(false);
     }
   };
-  const handleForeignPayment = async (e) => {
+
+  const handlePayment = (e) => {
     e.preventDefault();
-    const data = {
-      webinarId: webData._id,
-      firstName: formValues?.firstName,
-      lastName: formValues?.lastName,
-      email: formValues?.email,
-      currency: webData?.currency,
-    };
-    fincraWebinarCheckoutData(data, token)
-      .then((res) => {
-        // console.log(res);
-        setSubmit(false);
-        // setShowBookingModal(true);
-        const url = res.data.data.redirectUrl;
-        window.location.href = url;
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error(err.response?.data?.message || "Something went wrong");
-        setSubmit(false);
-      });
+    setProductId(webData._id);
+    setProductTitle(webData.title);
+    setProductPrice(webData.amount);
+    setProductCurrency(webData.currency);
+    setCategory("Webinar");
+    setBookType(webData.type || "paid");
+    setProductDescription(webData.description);
+
+    setCheckoutCallback(() => (values) => executePayment(values));
+
+    setCheckout(true);
+    setShowMain(false);
+    onClick(); // Close modal
   };
+
+  const handleForeignPayment = handlePayment; // Use same flow
   const handleclick = (e) => {
     e.preventDefault();
     setSubmit(true);
@@ -510,6 +543,7 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
                       : "Free"}
                   </div>
                   <button
+                    onClick={handlePayment}
                     disabled={loading || submit || finished}
                     className="rounded-lg bg-[#1453FF] px-6 py-3 text-[white] font-medium text-[14px] leading-5 cursor-pointer shadow hover:bg-[#0d36cc] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                   >
