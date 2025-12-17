@@ -273,6 +273,11 @@ const WebinarModal = ({ webinarId, token, provider, onClick, link }) => {
     router.push(link);
   };
 
+  // function truncateString(str) {
+  //   if (typeof str !== "string") return "";
+  //   if (str.length <= 30) return str;
+  //   return str.slice(0, 30) + "...";
+  // }
 
   return (
     <div>

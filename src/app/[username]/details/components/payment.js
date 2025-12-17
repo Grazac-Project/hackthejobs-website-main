@@ -48,7 +48,7 @@ const Payment = ({
   const [showCheckout, setShowCheckout] = useState(false);
   const router = useRouter();
 
-const [viewMoreLoading, setViewMoreLoading] = useState(false);
+  const [viewMoreLoading, setViewMoreLoading] = useState(false);
 
   const [currentPrice, setCurrentPrice] = useState(productPrice);
   const [currentCurrency, setCurrentCurrency] = useState(productCurrency);
@@ -293,12 +293,17 @@ const [viewMoreLoading, setViewMoreLoading] = useState(false);
   };
 
   const handleViewMore = () => {
-  if (viewMoreLoading) return;
+    if (viewMoreLoading) return;
 
-  setViewMoreLoading(true);
-  router.push(`/${expertSlug}/${productSlug}`);
-};
+    setViewMoreLoading(true);
+    router.push(`/${expertSlug}/${productSlug}`);
+  };
 
+  // function truncateString(str) {
+  //   if (typeof str !== "string") return "";
+  //   if (str.length <= 30) return str;
+  //   return str.slice(0, 30) + "...";
+  // }
   return (
     <div className="font-satoshi">
       {/* Overlay background */}

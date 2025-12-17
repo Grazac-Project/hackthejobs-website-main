@@ -540,6 +540,11 @@ const BookSession = ({
     router.push(`${pathname}/${bookingSlug}`);
   };
 
+// function truncateString(str) {
+//     if (typeof str !== "string") return "";
+//     if (str.length <= 30) return str;
+//     return str.slice(0, 30) + "...";
+//   }
 
   return (
     <div>
@@ -616,6 +621,7 @@ const BookSession = ({
                   {bookingData.title || "Let’s talk about negotiations"}
                 </h2>
                 <p className="font-regular text-[16px] leading-[20.8px] text-[#7D7D7D] pb-[8px]">
+                  
                   {extractFirstParagraph(bookingData.description) ||
                     "The booking description goes here in full with lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare."}
                 </p>

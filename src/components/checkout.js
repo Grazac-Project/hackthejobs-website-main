@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { allProductCheckout } from "@/api/authentication/auth";
 import { getCurrencySymbol } from "@/Utils/currency-formatter";
+import { extractFirstParagraph } from "@/Utils/stringUtils";
+
 
 
 const initialValues = {
@@ -17,7 +19,7 @@ const initialValues = {
   email: "",
 };
 
-const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, productDescription, productPrice, productCurrency, productType, category,}) => {
+const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, productDescription, productTitle, productPrice, productCurrency, productType, category,}) => {
   const router = useRouter();
   // const [loader, setLoader] = useState(false);
 
@@ -53,6 +55,13 @@ const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, produ
     validationSchema: schema,
     onSubmit,
   });
+
+  function truncateString(str) {
+    if (typeof str !== "string") return "";
+    if (str.length <= 30) return str;
+    return str.slice(0, 30) + "...";
+  }
+
   return (
     <div className="min-h-[100vh] py-[80px] xm:py-0 flex justify-center items-center font-satoshi bg-[url(/auth-bg.png)] bg-cover xm:bg-[#fff]">
       <div className="w-[538px] max-w-full xm:min-h-[100vh] bg-[#fff] p-8 sm:p-[16px] rounded-[8px]">
@@ -99,7 +108,7 @@ const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, produ
              {category?.toLowerCase() === "webinar" ? "Webinar title" : "Product name"}
             </h2>
             <p className="font-bold text-[16px] text-[#292D32] leading-[22px]">
-              {productDescription}
+              {productTitle || truncateString(extractFirstParagraph(productDescription))}
             </p>
           </div>
         </div>

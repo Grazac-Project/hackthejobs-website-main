@@ -1452,6 +1452,7 @@ const MentorDetails = () => {
           checkoutCallback={checkoutCallback}
           productId={productId}
           productDescription={productDescription}
+          productTitle={productTitle}
           productPrice={productPrice}
           productCurrency={productCurrency}
           productType={productType || bookType}
