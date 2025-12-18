@@ -76,8 +76,8 @@ const DigitalProduct = () => {
           // console.log("FULL RESPONSE:", response);
           console.log(apiData, "apiData");
           setSeller(seller);
-          setProduct(apiData);
-          setProductData(apiData); // Fix: Set productData so it's available for payment
+          setProduct({ ...apiData, currency: apiData.currency || "NGN" });
+          setProductData({ ...apiData, currency: apiData.currency || "NGN" }); // Fix: Set productData so it's available for payment
         } else {
           setError("Product not found");
         }
@@ -420,14 +420,28 @@ const DigitalProduct = () => {
                           amount: pricingOption.amount,
                           currency: pricingOption.currency,
                         }));
+                      } else {
+                        // For old items without pricing, just update currency
+                        setProduct((prev) => ({
+                          ...prev,
+                          currency: selectedCurrency,
+                        }));
+                        setProductData((prev) => ({
+                          ...prev,
+                          currency: selectedCurrency,
+                        }));
                       }
                     }}
                   >
-                    {product?.pricing?.map((price) => (
-                      <option key={price._id} value={price.currency}>
-                        {price.currency}
-                      </option>
-                    ))}
+                    {product?.pricing && product.pricing.length > 0 ? (
+                      product.pricing.map((price) => (
+                        <option key={price._id} value={price.currency}>
+                          {price.currency}
+                        </option>
+                      ))
+                    ) : (
+                      <option value={product?.currency}>{product?.currency}</option>
+                    )}
                   </select>
                   )}
                 </div>
@@ -461,7 +475,7 @@ const DigitalProduct = () => {
                     </div>
                     <hr className="border border-[#EAEAEA] " />
 
-                    <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] h-[216px]">
+                    <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] max-h-[200px] overflow-y-hidden">
                       {extractFirstParagraph (product?.description) || ""}
                     </div>
                     <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">

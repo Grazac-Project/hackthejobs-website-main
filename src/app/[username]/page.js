@@ -168,8 +168,8 @@ const MentorDetails = () => {
   const isProduction = process.env.NEXT_PUBLIC_DOMAIN_DEV;
   const baseUrl =
     isProduction === "development"
-      ? "https://test-dashboard.hackthejobs.com"
-      : "https://dashboard.hackthejobs.com";
+      ? "https://test-dashboard.prooval.com"
+      : "https://dashboard.prooval.com";
 
   useEffect(() => {
     const data = Cookies.get("user_details");
@@ -208,7 +208,7 @@ const MentorDetails = () => {
           // console.error("Error updating mentor preference:", error);
         });
     } else {
-      // window.location.href = "https://dashboard.hackthejobs.com/auth/signup";
+      // window.location.href = "https://dashboard.prooval.com/auth/signup";
       const redirectTo = encodeURIComponent(
         window.location.pathname + window.location.search
       );
@@ -239,7 +239,7 @@ const MentorDetails = () => {
         // toast.error(err.response?.data?.message);
         setLoading(false);
         // const isProduction = process.env.NEXT_PUBLIC_DOMAIN_DEV
-        // window.location.href = isProduction === "development" ? "https://hackthejobs-website-main.onrender.com/mentors" : "https://www.hackthejobs.com/mentors"
+        // window.location.href = isProduction === "development" ? "https://prooval-website-main.onrender.com/mentors" : "https://www.prooval.com/mentors"
       });
   };
 
@@ -318,8 +318,8 @@ const MentorDetails = () => {
       // window.location.href = `${baseUrl}/mentors/${slug}/details?id=${id}`;
       window.location.href =
         isProduction === "development"
-          ? `https://test.hackthejobs.com/market-place/${slug}/details?id=${id}`
-          : `https://www.hackthejobs.com/market-place/${slug}/details?id=${id}`;
+          ? `https://test.prooval.com/market-place/${slug}/details?id=${id}`
+          : `https://www.prooval.com/market-place/${slug}/details?id=${id}`;
       // window.location.href = `http://localhost:3000/market-place/${slug}/details?id=${id}`;
     }
   };
@@ -410,7 +410,7 @@ const MentorDetails = () => {
     //   Cookies.set("redirectTo", redirectTo, {
     //     secure: true,
     //     sameSite: "Lax",
-    //     domain: ".hackthejobs.com",
+    //     domain: ".prooval.com",
     //     path: "/",
     //     expires: 1,
     //   });
@@ -468,7 +468,7 @@ const MentorDetails = () => {
     //   Cookies.set("redirectTo", redirectTo, {
     //     secure: true,
     //     sameSite: "Lax",
-    //     domain: ".hackthejobs.com",
+    //     domain: ".prooval.com",
     //     path: "/",
     //     expires: 1,
     //   });
@@ -545,7 +545,7 @@ const MentorDetails = () => {
           {/* <Navbar /> */}
 
           {error ? (
-            <Error text={error} />
+            <Error text={error} buttonText="Create Page" path={`${baseUrl}/auth/signup`} />
           ) : (
             <>
               {loading ? (

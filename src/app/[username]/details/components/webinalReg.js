@@ -103,6 +103,8 @@ const WebinarModal = ({
             currency: firstPrice.currency,
           };
         }
+        // Set default currency to NGN if not present
+        webinar = { ...webinar, currency: webinar.currency || "NGN" };
         setWebData(webinar);
         setLoading(false);
       })
@@ -365,14 +367,24 @@ const WebinarModal = ({
                       amount: pricingOption.amount,
                       currency: pricingOption.currency,
                     }));
+                  } else {
+                    // For old items without pricing, just update currency
+                    setWebData((prev) => ({
+                      ...prev,
+                      currency: selectedCurrency,
+                    }));
                   }
                 }}
               >
-                {webData?.pricing?.map((price) => (
-                  <option key={price._id} value={price.currency}>
-                    {price.currency}
-                  </option>
-                ))}
+                {webData?.pricing && webData.pricing.length > 0 ? (
+                  webData.pricing.map((price) => (
+                    <option key={price._id} value={price.currency}>
+                      {price.currency}
+                    </option>
+                  ))
+                ) : (
+                  <option value={webData?.currency}>{webData?.currency}</option>
+                )}
               </select>
             )}
 
@@ -396,10 +408,10 @@ const WebinarModal = ({
               {/* Right content */}
               <div className="flex flex-col gap-6 w-[55%] md:w-full">
                 <div className="pt-10 lg:pt-2 ">
-                  <h3 className="mb-2 font-semibold leading-[120%] text-[24px]  text-[#000000]">
+                  <h3 className="mb-2 font-semibold leading-[120%] text-[24px]  text-[#000000] max-h-[100px] overflow-y-hidden">
                     {webData?.title}
                   </h3>
-                  <p className="mt-3 text-[#787878] text-[14px] line-clamp-3">
+                  <p className="mt-3 text-[#787878] text-[14px] line-clamp-3 max-h-[100px] overflow-y-hidden">
                     {extractFirstParagraph(webData?.description)}
                   </p>
                   <button

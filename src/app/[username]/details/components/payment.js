@@ -39,7 +39,7 @@ const Payment = ({
   expertSlug,
   productPricing,
   setProductPrice,
-  setProductCurrency
+  setProductCurrency,
 }) => {
   const [loading, setLoading] = useState("Access Product");
   const [freeMode, setFreeMode] = useState(false);
@@ -66,7 +66,7 @@ const Payment = ({
   }, [expertSlug, productSlug]);
 
   // Set button label based on product type
-  console.log({ productSlug })
+  console.log({ productSlug });
   useEffect(() => {
     console.log("Provider in Payment component:", provider);
     if (productType === "paid") setLoading("Make Payment");
@@ -116,7 +116,7 @@ const Payment = ({
   const handlePayment = async (x) => {
     try {
       setLoading("Initiating payment ...");
-      console.log(currentCurrency)
+      console.log(currentCurrency);
 
       const payload = { productId, currency: currentCurrency };
 
@@ -275,7 +275,6 @@ const Payment = ({
     );
   }, [currentCurrency, currentPrice, productType]);
 
-
   const currencySymbols = {
     NGN: "₦",
     USD: "$",
@@ -351,13 +350,15 @@ const Payment = ({
                 className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
                 value={currentCurrency}
                 onChange={(e) => {
-                  const selected = productPricing?.find((p) => p.currency === e.target.value);
+                  const selected = productPricing?.find(
+                    (p) => p.currency === e.target.value
+                  );
                   if (selected) {
                     setCurrentPrice(selected.amount);
                     setCurrentCurrency(selected.currency);
                   } else if (!productPricing || productPricing.length === 0) {
                     // Fallback if no pricing array, although logic implies we shouldn't be here if valid options are shown
-                    setCurrentCurrency(e.target.value)
+                    setCurrentCurrency(e.target.value);
                   }
                 }}
               >
@@ -403,42 +404,44 @@ const Payment = ({
               </div>
               <hr className="border border-[#EAEAEA] " />
 
-              <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] flex flex-col items-start h-[216px]">
-                <p>
-                  {extractFirstParagraph(productDescription) || ""}
-                </p>
-                <button
-                  onClick={handleViewMore}
-                  disabled={viewMoreLoading}
-                  className={`mt-2 flex items-center gap-2 text-[14px] font-medium
-                  ${viewMoreLoading
+              <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] flex flex-col items-start max-h-[200px] overflow-y-hidden">
+                <p>{extractFirstParagraph(productDescription) || ""}</p>
+              </div>
+              <button
+                onClick={handleViewMore}
+                disabled={viewMoreLoading}
+                className={`mt-3 flex items-center gap-2 text-[14px] font-medium xm:mb-9
+                  ${
+                    viewMoreLoading
                       ? "text-[#000] cursor-not-allowed"
                       : "text-[#1453FF] hover:underline"
-                    }`}>
-                  {viewMoreLoading && (
-                    <Image
-                      src="/loader.gif"
-                      width={14}
-                      height={14}
-                      alt="loading"
-                    />
-                  )}
+                  }`}
+              >
+                {viewMoreLoading && (
+                  <Image
+                    src="/loader.gif"
+                    width={14}
+                    height={14}
+                    alt="loading"
+                  />
+                )}
 
-                  {viewMoreLoading ? "Loading..." : "View more"}
-                </button>
+                {viewMoreLoading ? "Loading..." : "View more"}
+              </button>
 
-                {/* <button
+              {/* <button
                   onClick={() => { router.push(`/${expertSlug}/${productSlug}`) }}
                   className="text-primary underline mt-[16px]"
                 >
                   View more
                 </button> */}
 
-              </div>
               <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">
                 <div className="text-[18px] font-bold text-[#333333]">
                   {productType === "paid"
-                    ? `${currencySymbols[currentCurrency] || currentCurrency}${formatPrice(currentPrice)}`
+                    ? `${
+                        currencySymbols[currentCurrency] || currentCurrency
+                      }${formatPrice(currentPrice)}`
                     : "Free"}
                 </div>
                 <button
