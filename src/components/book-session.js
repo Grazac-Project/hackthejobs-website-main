@@ -621,7 +621,7 @@ const BookSession = ({
                 <h2 className="font-medium text-[24px] text-[#101828] leading-[25.62px]  pt-[24px] pb-[8px]">
                   {bookingData.title || "Let’s talk about negotiations"}
                 </h2>
-                <p className="font-regular text-[16px] leading-[20.8px] text-[#7D7D7D] pb-[8px]">
+                <p className="font-regular text-[16px] leading-[20.8px] text-[#7D7D7D] max-h-[100px] overflow-y-hidden">
                   
                   {extractFirstParagraph(bookingData.description) ||
                     "The booking description goes here in full with lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare."}
@@ -629,7 +629,7 @@ const BookSession = ({
                 <button
                   onClick={handleViewMore}
                   disabled={viewMoreLoading}
-                  className={`mb-6 flex items-center gap-2 text-[14px] font-medium
+                  className={`mb-6 flex items-center gap-2 text-[14px] font-medium mt-7
                    ${viewMoreLoading ? "text-[#000] cursor-not-allowed" : "text-[#1453FF] hover:underline"}`}>
                   {viewMoreLoading && (
                     <Image
