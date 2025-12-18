@@ -412,7 +412,7 @@ const Payment = ({
                   disabled={viewMoreLoading}
                   className={`mt-2 flex items-center gap-2 text-[14px] font-medium
                   ${viewMoreLoading
-                      ? "text-gray-400 cursor-not-allowed"
+                      ? "text-[#000] cursor-not-allowed"
                       : "text-[#1453FF] hover:underline"
                     }`}>
                   {viewMoreLoading && (

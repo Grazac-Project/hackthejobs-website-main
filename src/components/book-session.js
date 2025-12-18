@@ -630,7 +630,7 @@ const BookSession = ({
                   onClick={handleViewMore}
                   disabled={viewMoreLoading}
                   className={`mb-6 flex items-center gap-2 text-[14px] font-medium
-                   ${viewMoreLoading ? "text-[#1453FF] cursor-not-allowed" : "text-[#1453FF] hover:underline"}`}>
+                   ${viewMoreLoading ? "text-[#000] cursor-not-allowed" : "text-[#1453FF] hover:underline"}`}>
                   {viewMoreLoading && (
                     <Image
                       src="/loader.gif"
