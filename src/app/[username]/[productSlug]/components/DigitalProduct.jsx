@@ -399,7 +399,7 @@ const DigitalProduct = () => {
                     </button>
                     <span className="text-2xl font-semibold ml-2">Back</span>
                   </div>
-
+                  {product?.type && product.type.toLowerCase() === "paid" && (
                   <select
                     className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
                     value={product?.currency}
@@ -428,6 +428,7 @@ const DigitalProduct = () => {
                       </option>
                     ))}
                   </select>
+                  )}
                 </div>
 
                 {/* Product Details */}

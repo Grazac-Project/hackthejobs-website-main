@@ -630,29 +630,31 @@ const BookingPage = () => {
                 <span className="text-2xl font-semibold ml-2">Back</span>
               </div>
 
-              <select
-                className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
-                value={productData?.currency}
-                onChange={(e) => {
-                  const selectedCurrency = e.target.value;
-                  const pricingOption = productData?.pricing?.find(
-                    (p) => p.currency === selectedCurrency
-                  );
-                  if (pricingOption) {
-                    setProductData((prev) => ({
-                      ...prev,
-                      amount: pricingOption.amount,
-                      currency: pricingOption.currency,
-                    }));
-                  }
-                }}
-              >
-                {productData?.pricing?.map((price) => (
-                  <option key={price._id} value={price.currency}>
-                    {price.currency}
-                  </option>
-                ))}
-              </select>
+              {productData?.type && productData.type.toLowerCase() === "paid" && (
+                <select
+                  className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+                  value={productData?.currency}
+                  onChange={(e) => {
+                    const selectedCurrency = e.target.value;
+                    const pricingOption = productData?.pricing?.find(
+                      (p) => p.currency === selectedCurrency
+                    );
+                    if (pricingOption) {
+                      setProductData((prev) => ({
+                        ...prev,
+                        amount: pricingOption.amount,
+                        currency: pricingOption.currency,
+                      }));
+                    }
+                  }}
+                >
+                  {productData?.pricing?.map((price) => (
+                    <option key={price._id} value={price.currency}>
+                      {price.currency}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
             {/* Product Hero and Info Section */}
             <h2 className="font-medium text-[24px] text-[#101828] leading-[25.62px] mb-[24px]">
@@ -825,9 +827,7 @@ const BookingPage = () => {
                 <div className="w-full flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] rounded-2xl p-6 mt-8">
                   <div>
                     <span className="text-lg font-bold text-[#101828]">
-                      {currencySymbols[productData.currency] ||
-                        productData.currency}
-                      {productData.amount?.toLocaleString()}
+                      {productData?.type && productData.type.toLowerCase() === "free" ? "Free" : `${currencySymbols[productData.currency] || productData.currency}${productData.amount?.toLocaleString()}`}
                     </span>
                   </div>
                   <button
