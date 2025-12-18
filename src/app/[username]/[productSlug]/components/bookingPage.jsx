@@ -153,7 +153,7 @@ const BookingPage = () => {
           let mappedData;
 
           let displayAmount = apiData.amount || 0;
-          let displayCurrency = apiData.currency;
+          let displayCurrency = apiData.currency || "NGN";
           const pricingList = apiData.pricing || [];
 
           if ((!displayAmount || Number(displayAmount) === 0) && pricingList.length > 0) {
@@ -645,14 +645,24 @@ const BookingPage = () => {
                         amount: pricingOption.amount,
                         currency: pricingOption.currency,
                       }));
+                    } else {
+                      // For old items without pricing, just update currency
+                      setProductData((prev) => ({
+                        ...prev,
+                        currency: selectedCurrency,
+                      }));
                     }
                   }}
                 >
-                  {productData?.pricing?.map((price) => (
-                    <option key={price._id} value={price.currency}>
-                      {price.currency}
-                    </option>
-                  ))}
+                  {productData?.pricing && productData.pricing.length > 0 ? (
+                    productData.pricing.map((price) => (
+                      <option key={price._id} value={price.currency}>
+                        {price.currency}
+                      </option>
+                    ))
+                  ) : (
+                    <option value={productData?.currency}>{productData?.currency}</option>
+                  )}
                 </select>
               )}
             </div>

@@ -263,7 +263,7 @@ const WebinarPage = () => {
                   );
                   return match ? apiData.currency : apiData.pricing[0].currency;
                 }
-                return apiData.currency;
+                return apiData.currency || "NGN";
               })(),
               type: apiData.type, // "free" or "paid"
               category: "Webinar",
@@ -430,14 +430,24 @@ const WebinarPage = () => {
                       amount: pricingOption.amount,
                       currency: pricingOption.currency,
                     }));
+                  } else {
+                    // For old items without pricing, just update currency
+                    setProductData((prev) => ({
+                      ...prev,
+                      currency: selectedCurrency,
+                    }));
                   }
                 }}
               >
-                {productData?.pricing?.map((price) => (
-                  <option key={price._id} value={price.currency}>
-                    {price.currency}
-                  </option>
-                ))}
+                {productData?.pricing && productData.pricing.length > 0 ? (
+                  productData.pricing.map((price) => (
+                    <option key={price._id} value={price.currency}>
+                      {price.currency}
+                    </option>
+                  ))
+                ) : (
+                  <option value={productData?.currency}>{productData?.currency}</option>
+                )}
               </select>
             </div>
             {/* Product Hero and Info Section */}
