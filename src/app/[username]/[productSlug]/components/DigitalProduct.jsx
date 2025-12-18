@@ -475,7 +475,7 @@ const DigitalProduct = () => {
                     </div>
                     <hr className="border border-[#EAEAEA] " />
 
-                    <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] h-[216px] overflow-y-hidden">
+                    <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] max-h-[200px] overflow-y-hidden">
                       {extractFirstParagraph (product?.description) || ""}
                     </div>
                     <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">

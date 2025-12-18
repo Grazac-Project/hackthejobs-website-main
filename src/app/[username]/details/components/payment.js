@@ -404,7 +404,7 @@ const Payment = ({
               </div>
               <hr className="border border-[#EAEAEA] " />
 
-              <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] flex flex-col items-start max-h-[216px] overflow-y-hidden">
+              <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] flex flex-col items-start max-h-[200px] overflow-y-hidden">
                 <p>{extractFirstParagraph(productDescription) || ""}</p>
               </div>
               <button
