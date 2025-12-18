@@ -18,6 +18,7 @@ import {
 import { Load } from "@/components/loading";
 import Checkout from "@/components/checkout";
 import Error from "@/components/error";
+import { extractFirstParagraph } from "@/Utils/stringUtils";
 
 const DigitalProduct = () => {
   const params = useParams();
@@ -461,7 +462,7 @@ const DigitalProduct = () => {
                     <hr className="border border-[#EAEAEA] " />
 
                     <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] h-[216px]">
-                      {product?.description || ""}
+                      {extractFirstParagraph (product?.description) || ""}
                     </div>
                     <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">
                       <div className="text-[18px] font-bold text-[#333333]">
