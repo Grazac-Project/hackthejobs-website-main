@@ -589,22 +589,23 @@ const BookSession = ({
                   Book Session
                 </h1>
               </div>
-
-              <select
-                className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
-                value={currentCurrency}
-                onChange={handleCurrencyChange}
-              >
-                {productPricing && productPricing.length > 0 ? (
-                  productPricing.map((pricing, index) => (
-                    <option key={index} value={pricing.currency}>
-                      {pricing.currency}
-                    </option>
-                  ))
-                ) : (
-                  <option value={currentCurrency}>{currentCurrency}</option>
-                )}
-              </select>
+              {type && type.toLowerCase() === "paid" && (
+                <select
+                  className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+                  value={currentCurrency}
+                  onChange={handleCurrencyChange}
+                >
+                  {productPricing && productPricing.length > 0 ? (
+                    productPricing.map((pricing, index) => (
+                      <option key={index} value={pricing.currency}>
+                        {pricing.currency}
+                      </option>
+                    ))
+                  ) : (
+                    <option value={currentCurrency}>{currentCurrency}</option>
+                  )}
+                </select>
+              )}
             </div>
             {loader ? (
               <Load />
@@ -738,8 +739,7 @@ const BookSession = ({
                   <div className="flex items-center justify-between border border-[#EAEAEA] bg-[#FAFAFA] rounded-[8px] px-[20px] py-[5px] mt-[20px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:px-[20px]">
                     <div>
                       <span className="text-lg font-bold text-[#101828]">
-                        {getCurrencySymbol(currentCurrency)}
-                        {formatPrice(currentPrice)}
+                        {type && type.toLowerCase() === "free" ? "Free" : `${getCurrencySymbol(currentCurrency)}${formatPrice(currentPrice)}`}
                       </span>
                     </div>
                     <button
