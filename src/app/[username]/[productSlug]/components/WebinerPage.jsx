@@ -53,13 +53,13 @@ const WebinarPage = () => {
   }, []);
 
   const openCheckout = () => {
-    setMain(false)
+    setMain(false);
     setCheckout(true);
   };
 
   const exitCheckout = () => {
     setCheckout(false);
-    setMain(true)
+    setMain(true);
     setSuccess(false);
   };
   const handleRegister = async (values) => {
@@ -257,7 +257,11 @@ const WebinarPage = () => {
               })(),
               currency: (() => {
                 // Check if need to fallback currency
-                if ((!apiData.amount || apiData.amount === 0) && apiData.pricing && apiData.pricing.length > 0) {
+                if (
+                  (!apiData.amount || apiData.amount === 0) &&
+                  apiData.pricing &&
+                  apiData.pricing.length > 0
+                ) {
                   const match = apiData.pricing.find(
                     (p) => p.currency === apiData.currency
                   );
@@ -300,7 +304,11 @@ const WebinarPage = () => {
                 return 0;
               })(),
               currency: (() => {
-                if ((!apiData.amount || apiData.amount === 0) && apiData.pricing && apiData.pricing.length > 0) {
+                if (
+                  (!apiData.amount || apiData.amount === 0) &&
+                  apiData.pricing &&
+                  apiData.pricing.length > 0
+                ) {
                   const match = apiData.pricing.find(
                     (p) => p.currency === apiData.currency
                   );
@@ -330,7 +338,7 @@ const WebinarPage = () => {
         console.error("Error fetching product:", err);
         setError(
           err.response?.data?.message ||
-          "Failed to load product. Please try again."
+            "Failed to load product. Please try again."
         );
       } finally {
         setLoading(false);
@@ -362,9 +370,7 @@ const WebinarPage = () => {
     <div className="min-h-screen bg-[#F2F2F7]">
       <ToastContainer />
       <Link href="/">
-        <div
-          className="bg-[#ffff] rounded-md py-6 px-6"
-        >
+        <div className="bg-[#ffff] rounded-md py-6 px-6">
           <Image
             src="/prooval-logo.svg"
             width={100.44}
@@ -391,7 +397,8 @@ const WebinarPage = () => {
             <div className="flex items-center justify-between mb-[35px]">
               <div
                 onClick={() => router.push(`/${username}`)}
-                className="flex items-center gap-[12px]  p-[8px] rounded-[8px] bg-[#FAFAFA] w-[210px] xm:w-[168px] whitespace-nowrap cursor-pointer border border-[#EDEDED] truncate sxm:hidden">
+                className="flex items-center gap-[12px]  p-[8px] rounded-[8px] bg-[#FAFAFA] w-[210px] xm:w-[168px] whitespace-nowrap cursor-pointer border border-[#EDEDED] truncate sxm:hidden"
+              >
                 <Image
                   src={productData.profilePic}
                   alt="profilepics"
@@ -399,7 +406,9 @@ const WebinarPage = () => {
                   height={32}
                 />
                 <div className="flex flex-col">
-                  <p className="text-[12px] text-[#101828] mb-[2px] font-normal">Listed by</p>
+                  <p className="text-[12px] text-[#101828] mb-[2px] font-normal">
+                    Listed by
+                  </p>
                   <p className="text-[16px] text-[#101828] xm:text-[12px] font-medium truncate">
                     {productData.firstName} {productData.lastName}
                   </p>
@@ -415,40 +424,43 @@ const WebinarPage = () => {
                 </button>
                 <span className="text-2xl font-semibold ml-2">Back</span>
               </div>
-
-              <select
-                className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
-                value={productData?.currency}
-                onChange={(e) => {
-                  const selectedCurrency = e.target.value;
-                  const pricingOption = productData?.pricing?.find(
-                    (p) => p.currency === selectedCurrency
-                  );
-                  if (pricingOption) {
-                    setProductData((prev) => ({
-                      ...prev,
-                      amount: pricingOption.amount,
-                      currency: pricingOption.currency,
-                    }));
-                  } else {
-                    // For old items without pricing, just update currency
-                    setProductData((prev) => ({
-                      ...prev,
-                      currency: selectedCurrency,
-                    }));
-                  }
-                }}
-              >
-                {productData?.pricing && productData.pricing.length > 0 ? (
-                  productData.pricing.map((price) => (
-                    <option key={price._id} value={price.currency}>
-                      {price.currency}
+              {productData.type && productData?.type.toLowerCase() === "paid" && (
+                <select
+                  className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+                  value={productData?.currency}
+                  onChange={(e) => {
+                    const selectedCurrency = e.target.value;
+                    const pricingOption = productData?.pricing?.find(
+                      (p) => p.currency === selectedCurrency
+                    );
+                    if (pricingOption) {
+                      setProductData((prev) => ({
+                        ...prev,
+                        amount: pricingOption.amount,
+                        currency: pricingOption.currency,
+                      }));
+                    } else {
+                      // For old items without pricing, just update currency
+                      setProductData((prev) => ({
+                        ...prev,
+                        currency: selectedCurrency,
+                      }));
+                    }
+                  }}
+                >
+                  {productData?.pricing && productData.pricing.length > 0 ? (
+                    productData.pricing.map((price) => (
+                      <option key={price._id} value={price.currency}>
+                        {price.currency}
+                      </option>
+                    ))
+                  ) : (
+                    <option value={productData?.currency}>
+                      {productData?.currency}
                     </option>
-                  ))
-                ) : (
-                  <option value={productData?.currency}>{productData?.currency}</option>
-                )}
-              </select>
+                  )}
+                </select>
+              )}
             </div>
             {/* Product Hero and Info Section */}
             <div className="flex lg:flex-col gap-8 mb-8">

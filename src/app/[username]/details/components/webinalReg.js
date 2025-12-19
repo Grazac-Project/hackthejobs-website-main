@@ -323,23 +323,29 @@ const WebinarModal = ({
       <ToastContainer />
 
       {success ? (
-        <div className="bg-[#fff] w-[447px] h-[291px]  md:max-w-full p-8  flex flex-col items-center text-center rounded-[8px]  fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 overflow-y-auto">
-          <Image src="/sucess.svg" width={57} height={57} alt="success" />
-          <h3 className="font-medium  text-[24px] text-[#121927] leading-[11.71px] py-[16px]">
-            Registered Successfully
-          </h3>
-          <p className="font-regular text-[16px] text-[#555555] leading-[24px] mb-[20px]">
-            You have successfully registered for{" "}
-            <span className="font-semibold">{webData?.title}</span> design
-            webinar
-          </p>
-          <button
-            className="min-w-[76px] h-[44px] rounded-[8px] border-[1px] px-[20px] py-[12px] font-medium bg-[#1453FF] text-[14px] text-[#fff] leading-[19.6px] tracking-[2%] mx-auto"
-            onClick={onClick}
-          >
-            Done
-          </button>
-        </div>
+        <>
+          <div
+            className="fixed inset-0 bg-[black] bg-opacity-50 z-40"
+            onClick={() => setSuccess(false)}
+          />
+          <div className="bg-[#fff] w-[447px] h-[291px]  md:max-w-full p-8  flex flex-col items-center text-center rounded-[8px]  fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 overflow-y-auto">
+            <Image src="/sucess.svg" width={57} height={57} alt="success" />
+            <h3 className="font-medium  text-[24px] text-[#121927] leading-[11.71px] py-[16px]">
+              Registered Successfully
+            </h3>
+            <p className="font-regular text-[16px] text-[#555555] leading-[24px] mb-[20px]">
+              You have successfully registered for{" "}
+              <span className="font-semibold">{webData?.title}</span> design
+              webinar
+            </p>
+            <button
+              className="min-w-[76px] h-[44px] rounded-[8px] border-[1px] px-[20px] py-[12px] font-medium bg-[#1453FF] text-[14px] text-[#fff] leading-[19.6px] tracking-[2%] mx-auto"
+              onClick={onClick}
+            >
+              Done
+            </button>
+          </div>
+        </>
       ) : (
         <div className="max-w-[52rem] h-fit sm:h-full max-h-[90%] sm:max-h-full mx-auto mt-10 sm:mt-0 px-14 py-20 sm:px-6 space-y-8 bg-[white] rounded-2xl sm:rounded-none fixed inset-0 z-50 overflow-y-auto ">
           <div className="flex items-center justify-between">
@@ -350,7 +356,7 @@ const WebinarModal = ({
               >
                 <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
               </button>
-              <span className="text-2xl font-semibold ml-4">Back</span>
+              <span className="text-[18px] text-[#121927] font-medium ml-4">Back</span>
             </div>
             {webData?.type && webData?.type.toLowerCase() === "paid" && (
               <select
