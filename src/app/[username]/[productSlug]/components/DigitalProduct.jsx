@@ -320,8 +320,8 @@ const DigitalProduct = () => {
 
     window.location.href =
       isProduction === "development"
-        ? `${process.env.NEXT_PUBLIC_STAGING_DASH_URL}/digital-products`
-        : `${process.env.NEXT_PUBLIC_DASH_URL}/digital-products`;
+        ? `${process.env.NEXT_PUBLIC_STAGING_DASH_URL}/products`
+        : `${process.env.NEXT_PUBLIC_DASH_URL}/products`;
   };
 
   if (error) {

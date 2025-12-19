@@ -98,9 +98,13 @@ const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, produ
               <h2 className="font-normal text-[14px] text-[#101828] leading-[180%] tracking-[0] mb-2">
                 Price
               </h2>
-              {String(productPrice) !== '0'?<p className="font-bold text-[16px] text-[#292D32] leading-[22px]">
-                {getCurrencySymbol(productCurrency)}{String(productPrice)}
-              </p>: <p className="font-bold text-[16px] text-[#292D32] leading-[22px]">Free</p>}
+              {productPrice && productPrice !== 0 ? (
+                <p className="font-bold text-[16px] text-[#292D32] leading-[22px]">
+                  {getCurrencySymbol(productCurrency)}{String(productPrice)}
+                </p>
+              ) : (
+                <p className="font-bold text-[16px] text-[#292D32] leading-[22px]">Free</p>
+              )}
             </div>
           </div>
           <div>
