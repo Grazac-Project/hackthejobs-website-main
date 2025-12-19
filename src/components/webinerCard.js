@@ -33,18 +33,18 @@ export default function EventCard({
       onClick={action}
     >
       {/* Media */}
-      <div className="relative aspect-[16/5] w-full">
+      <div className="relative h-[162px] w-full">
         <Image
           src={image}
           alt=""
           fill
           priority={false}
-          className="object-cover h-[36p]"
+          className="object-cover "
         />
       </div>
 
       {/* Content */}
-      <div className=" flex gap-4 px-6 py-4">
+      <div className=" flex gap-4 px-[20px] py-4">
         {/* Date pill */}
         <div
           aria-label={`${month} ${day}`}
@@ -67,12 +67,12 @@ export default function EventCard({
         </div>
         <div>
           {/* Title */}
-          <h3 className="mb-2 font-bold leading-[100%] test-[14px]  text-[#000000]">
+          <h3 className="mb-2 font-bold leading-[100%] text-[14px]  text-[#333333]">
             {title}
           </h3>
 
           {/* Meta */}
-          <div className="grid gap-1 text-[10px] text-[#667085]">
+          <div className="grid gap-1 text-[10px] font-normal text-[#667085]">
             <div className="flex items-center gap-2">
               <FaVideo className="h-[14px] w-[14px]" />
               <span>{venue}</span>

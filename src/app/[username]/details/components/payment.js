@@ -343,7 +343,7 @@ const Payment = ({
               >
                 <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
               </button>
-              <span className="text-2xl font-semibold ml-4">Back</span>
+              <span className="text-[18px] text-[#121927] font-medium ml-4">Back</span>
             </div>
             {productType === "paid" && (
               <select

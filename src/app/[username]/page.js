@@ -1125,16 +1125,16 @@ const MentorDetails = () => {
 
 
                     <div className=" mx-auto mt-3" id="book-session">
-                      <section className="flex flex-col  gap-2 bg-[#ffff] border border-[#EAEAEA] p-8  bg-[#ffffff] py-6 px-20 lg:px-10 md:px-4 mb-[10px]  rounded-[8px] w-[1084px] xl:w-[95%] min-h-[212px]  m-auto">
-                        <div className="max-w-6xl mx-auto mt-10 p-6 space-y-8 bg-[white] rounded-2xl">
-                          <h2 className="text-[28px] font-semibold">
+                      <section className="flex flex-col  gap-2 bg-[#ffff] border border-[#EAEAEA] p-8  bg-[#ffffff] py-6  lg:px-10 md:px-4 mb-[10px]  rounded-[8px] w-[1084px] xl:w-[95%] min-h-[212px]  m-auto">
+                        <div className="max-w-6xl mx-auto mt-[32px] p-6 space-y-8 bg-[white] rounded-2xl sm:p-0">
+                          <h2 className="text-[24px] text-[#333333] font-bold">
                             Available packages
                           </h2>
 
                           {/* Digital Products */}
                           {mentorData?.digitalProducts?.length > 0 && (
                             <div>
-                              <h3 className="text-lg font-semibold mb-4 ">
+                              <h3 className="text-[20px] text-[#333333] font-semibold mb-4 ">
                                 Digital products
                               </h3>
                               <div className="grid md:grid-cols-1 grid-cols-3 gap-6">
@@ -1159,7 +1159,7 @@ const MentorDetails = () => {
                                     }
                                   >
                                     <div
-                                      className={`h-36 rounded-lg mb-2 bg-cover bg-center `}
+                                      className={`h-[150px] rounded-lg mb-2 bg-cover bg-center `}
                                       style={{
                                         backgroundImage: `url(${book?.thumbnail})`,
                                         // backgroundColor: id === 1 ? "#FF353599" : "#00875399",
@@ -1198,7 +1198,7 @@ const MentorDetails = () => {
                           {/* 1-on-1 Sessions */}
                           {mentorData?.oneOnOneSessions?.length > 0 && (
                             <div>
-                              <h3 className="text-lg font-semibold leading-[140%] mb-4">
+                              <h3 className="text-[2px] text-[#333333] font-semibold leading-[140%] mb-4">
                                 1-on-1 Sessions
                               </h3>
                               <div className="grid md:grid-cols-1 grid-cols-3 gap-6">
@@ -1303,7 +1303,7 @@ const MentorDetails = () => {
                           {/* Group Package */}
                           {mentorData?.packageMentorships?.length > 0 && (
                             <div className="">
-                              <h3 className="text-lg font-semibold mb-4">
+                              <h3 className="text-[20px] textt-[#333333] font-semibold mb-4">
                                 Packages
                               </h3>
                               <div className="grid md:grid-cols-1 grid-cols-2 gap-6">
@@ -1415,7 +1415,7 @@ const MentorDetails = () => {
                           {/* //webinar */}
                           {mentorData?.webinars?.length > 0 && (
                             <div className="">
-                              <h3 className="text-lg font-semibold mb-4">
+                              <h3 className="text-[#333333] font-semibold mb-4 text-[20px] ">
                                 Webinar
                               </h3>
                               <div className="grid md:grid-cols-1 grid-cols-3 gap-6">
