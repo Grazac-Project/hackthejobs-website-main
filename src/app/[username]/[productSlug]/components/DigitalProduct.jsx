@@ -469,7 +469,7 @@ const DigitalProduct = () => {
                           <FiEye className="text-[#333333]" />
                         )}
                         <p className="font-medium text-xs text-[#333333]">
-                          {product?.accessType ? "Download" : "View Only"}
+                          {product?.accessType ? "Downloadable" : "View Only"}
                         </p>
                       </button>
                     </div>
@@ -478,7 +478,7 @@ const DigitalProduct = () => {
                     <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] max-h-[200px] overflow-y-hidden">
                       {extractFirstParagraph (product?.description) || ""}
                     </div>
-                    <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">
+                    <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-auto xm:mt-0 xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">
                       <div className="text-[18px] font-bold text-[#333333]">
                         {product?.type === "paid"
                           ? `${currencySymbols[product?.currency] || product?.currency}${formatPrice(product?.amount)}`
