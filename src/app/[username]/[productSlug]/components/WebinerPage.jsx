@@ -277,6 +277,7 @@ const WebinarPage = () => {
               firstName: mentorData.firstName,
               lastName: mentorData.lastName,
               pricing: apiData.pricing,
+              questions: apiData.questions || [],
             };
           } else if (productType === "booking") {
             // Map booking response
@@ -324,6 +325,7 @@ const WebinarPage = () => {
               _id: apiData._id,
               productType: "booking",
               pricing: apiData.pricing,
+              questions: apiData.questions || [],
             };
           } else {
             setError("Unknown product type");
@@ -424,43 +426,44 @@ const WebinarPage = () => {
                 </button>
                 <span className="text-2xl font-semibold ml-2">Back</span>
               </div>
-              {productData.type && productData?.type.toLowerCase() === "paid" && (
-                <select
-                  className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
-                  value={productData?.currency}
-                  onChange={(e) => {
-                    const selectedCurrency = e.target.value;
-                    const pricingOption = productData?.pricing?.find(
-                      (p) => p.currency === selectedCurrency
-                    );
-                    if (pricingOption) {
-                      setProductData((prev) => ({
-                        ...prev,
-                        amount: pricingOption.amount,
-                        currency: pricingOption.currency,
-                      }));
-                    } else {
-                      // For old items without pricing, just update currency
-                      setProductData((prev) => ({
-                        ...prev,
-                        currency: selectedCurrency,
-                      }));
-                    }
-                  }}
-                >
-                  {productData?.pricing && productData.pricing.length > 0 ? (
-                    productData.pricing.map((price) => (
-                      <option key={price._id} value={price.currency}>
-                        {price.currency}
+              {productData.type &&
+                productData?.type.toLowerCase() === "paid" && (
+                  <select
+                    className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+                    value={productData?.currency}
+                    onChange={(e) => {
+                      const selectedCurrency = e.target.value;
+                      const pricingOption = productData?.pricing?.find(
+                        (p) => p.currency === selectedCurrency
+                      );
+                      if (pricingOption) {
+                        setProductData((prev) => ({
+                          ...prev,
+                          amount: pricingOption.amount,
+                          currency: pricingOption.currency,
+                        }));
+                      } else {
+                        // For old items without pricing, just update currency
+                        setProductData((prev) => ({
+                          ...prev,
+                          currency: selectedCurrency,
+                        }));
+                      }
+                    }}
+                  >
+                    {productData?.pricing && productData.pricing.length > 0 ? (
+                      productData.pricing.map((price) => (
+                        <option key={price._id} value={price.currency}>
+                          {price.currency}
+                        </option>
+                      ))
+                    ) : (
+                      <option value={productData?.currency}>
+                        {productData?.currency}
                       </option>
-                    ))
-                  ) : (
-                    <option value={productData?.currency}>
-                      {productData?.currency}
-                    </option>
-                  )}
-                </select>
-              )}
+                    )}
+                  </select>
+                )}
             </div>
             {/* Product Hero and Info Section */}
             <div className="flex lg:flex-col gap-8 mb-8">
@@ -529,6 +532,7 @@ const WebinarPage = () => {
           productCurrency={productData.currency}
           productType={productData.type}
           category={productData.category}
+          questions={productData.extraQuestions || []}
         />
       )}
     </div>

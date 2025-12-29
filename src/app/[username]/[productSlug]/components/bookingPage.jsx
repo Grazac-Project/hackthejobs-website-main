@@ -156,8 +156,13 @@ const BookingPage = () => {
           let displayCurrency = apiData.currency || "NGN";
           const pricingList = apiData.pricing || [];
 
-          if ((!displayAmount || Number(displayAmount) === 0) && pricingList.length > 0) {
-            const match = pricingList.find((p) => p.currency === displayCurrency);
+          if (
+            (!displayAmount || Number(displayAmount) === 0) &&
+            pricingList.length > 0
+          ) {
+            const match = pricingList.find(
+              (p) => p.currency === displayCurrency
+            );
             if (match) {
               displayAmount = match.amount;
               displayCurrency = match.currency;
@@ -190,6 +195,7 @@ const BookingPage = () => {
               firstName: mentorData.firstName,
               lastName: mentorData.lastName,
               mentorId: mentorData._id,
+              questions: apiData.questions || [],
             };
           } else if (productType === "booking") {
             // Map booking response
@@ -221,6 +227,7 @@ const BookingPage = () => {
               lastName: mentorData.lastName,
               profilePic: mentorData.profilePic,
               mentorId: mentorData._id,
+              questions: apiData.questions || [],
             };
           } else {
             setError("Unknown product type");
@@ -242,7 +249,7 @@ const BookingPage = () => {
         console.error("Error fetching product:", err);
         setError(
           err.response?.data?.message ||
-          "Failed to load product. Please try again."
+            "Failed to load product. Please try again."
         );
       } finally {
         setLoading(false);
@@ -395,8 +402,8 @@ const BookingPage = () => {
       setMain(true);
       toast.error(
         error.response?.data?.error ||
-        error.response?.data?.message ||
-        "Payment initialization failed"
+          error.response?.data?.message ||
+          "Payment initialization failed"
       );
     }
   };
@@ -530,8 +537,8 @@ const BookingPage = () => {
         setMain(true);
         toast.error(
           err.response?.data?.error ||
-          err.response?.data?.message ||
-          "Foreign payment failed"
+            err.response?.data?.message ||
+            "Foreign payment failed"
         );
       });
   };
@@ -630,41 +637,44 @@ const BookingPage = () => {
                 <span className="text-2xl font-semibold ml-2">Back</span>
               </div>
 
-              {productData?.type && productData.type.toLowerCase() === "paid" && (
-                <select
-                  className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
-                  value={productData?.currency}
-                  onChange={(e) => {
-                    const selectedCurrency = e.target.value;
-                    const pricingOption = productData?.pricing?.find(
-                      (p) => p.currency === selectedCurrency
-                    );
-                    if (pricingOption) {
-                      setProductData((prev) => ({
-                        ...prev,
-                        amount: pricingOption.amount,
-                        currency: pricingOption.currency,
-                      }));
-                    } else {
-                      // For old items without pricing, just update currency
-                      setProductData((prev) => ({
-                        ...prev,
-                        currency: selectedCurrency,
-                      }));
-                    }
-                  }}
-                >
-                  {productData?.pricing && productData.pricing.length > 0 ? (
-                    productData.pricing.map((price) => (
-                      <option key={price._id} value={price.currency}>
-                        {price.currency}
+              {productData?.type &&
+                productData.type.toLowerCase() === "paid" && (
+                  <select
+                    className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+                    value={productData?.currency}
+                    onChange={(e) => {
+                      const selectedCurrency = e.target.value;
+                      const pricingOption = productData?.pricing?.find(
+                        (p) => p.currency === selectedCurrency
+                      );
+                      if (pricingOption) {
+                        setProductData((prev) => ({
+                          ...prev,
+                          amount: pricingOption.amount,
+                          currency: pricingOption.currency,
+                        }));
+                      } else {
+                        // For old items without pricing, just update currency
+                        setProductData((prev) => ({
+                          ...prev,
+                          currency: selectedCurrency,
+                        }));
+                      }
+                    }}
+                  >
+                    {productData?.pricing && productData.pricing.length > 0 ? (
+                      productData.pricing.map((price) => (
+                        <option key={price._id} value={price.currency}>
+                          {price.currency}
+                        </option>
+                      ))
+                    ) : (
+                      <option value={productData?.currency}>
+                        {productData?.currency}
                       </option>
-                    ))
-                  ) : (
-                    <option value={productData?.currency}>{productData?.currency}</option>
-                  )}
-                </select>
-              )}
+                    )}
+                  </select>
+                )}
             </div>
             {/* Product Hero and Info Section */}
             <h2 className="font-medium text-[24px] text-[#101828] leading-[25.62px] mb-[24px]">
@@ -807,10 +817,11 @@ const BookingPage = () => {
                           <button
                             key={index}
                             onClick={() => handleTimeSelected(time, index)}
-                            className={`py-4 px-3 text-xs border rounded-lg transition-colors ${selectedTimeIndex === index
-                              ? "bg-[#1453FF] text-[white] border-2 border-[#1453FF] shadow-[0_0_0_2px_#BEDBFF]"
-                              : "bg-[white] text-[#344054] border-[#D0D5DD] hover:border-[#1453FF]"
-                              }`}
+                            className={`py-4 px-3 text-xs border rounded-lg transition-colors ${
+                              selectedTimeIndex === index
+                                ? "bg-[#1453FF] text-[white] border-2 border-[#1453FF] shadow-[0_0_0_2px_#BEDBFF]"
+                                : "bg-[white] text-[#344054] border-[#D0D5DD] hover:border-[#1453FF]"
+                            }`}
                           >
                             {time}
                           </button>
@@ -830,23 +841,32 @@ const BookingPage = () => {
                       </div>
                     </>
                   ) : (
-                    <p className="text-sm text-[#292D32] max-w-[213px] text-center flex items-center justify-center m-auto  h-full">Select a date to view the available time slots</p>
+                    <p className="text-sm text-[#292D32] max-w-[213px] text-center flex items-center justify-center m-auto  h-full">
+                      Select a date to view the available time slots
+                    </p>
                   )}
                 </div>
 
                 <div className="w-full flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] rounded-2xl p-6 mt-8">
                   <div>
                     <span className="text-lg font-bold text-[#101828]">
-                      {productData?.type && productData.type.toLowerCase() === "free" ? "Free" : `${currencySymbols[productData.currency] || productData.currency}${productData.amount?.toLocaleString()}`}
+                      {productData?.type &&
+                      productData.type.toLowerCase() === "free"
+                        ? "Free"
+                        : `${
+                            currencySymbols[productData.currency] ||
+                            productData.currency
+                          }${productData.amount?.toLocaleString()}`}
                     </span>
                   </div>
                   <button
                     onClick={() => openCheckout()}
                     disabled={selectedTimeIndex === null}
-                    className={`px-6 py-2 rounded-lg text-sm font-medium text-[white] transition-colors ${selectedTimeIndex !== null
-                      ? "bg-[#1453FF] hover:bg-blue-700"
-                      : "bg-gray-300 cursor-not-allowed"
-                      }`}
+                    className={`px-6 py-2 rounded-lg text-sm font-medium text-[white] transition-colors ${
+                      selectedTimeIndex !== null
+                        ? "bg-[#1453FF] hover:bg-blue-700"
+                        : "bg-gray-300 cursor-not-allowed"
+                    }`}
                   >
                     Make Payment
                   </button>
@@ -901,6 +921,7 @@ const BookingPage = () => {
           productCurrency={productData.currency}
           productType={productData.type}
           category={productData.category}
+          questions={productData.extraQuestions || []}
         />
       )}
     </div>

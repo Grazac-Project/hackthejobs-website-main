@@ -58,7 +58,8 @@ const WebinarModal = ({
   setBookType,
   setProductDescription,
   setLoader,
-  successPaymentModal
+  successPaymentModal,
+  setQuestions,
 }) => {
   const [webData, setWebData] = useState({});
   const [singleWebData, setSingleWebData] = useState({});
@@ -95,7 +96,11 @@ const WebinarModal = ({
     getSingleWebinar(webinarId, token)
       .then((res) => {
         let webinar = res.data?.data?.webinar;
-        if (webinar && (webinar.amount === 0 || !webinar.amount) && webinar.pricing?.length > 0) {
+        if (
+          webinar &&
+          (webinar.amount === 0 || !webinar.amount) &&
+          webinar.pricing?.length > 0
+        ) {
           const firstPrice = webinar.pricing[0];
           webinar = {
             ...webinar,
@@ -264,6 +269,7 @@ const WebinarModal = ({
     setCategory("Webinar");
     setBookType(webData.type || "paid");
     setProductDescription(webData.description);
+    if (setQuestions) setQuestions(webData.questions || []);
 
     setCheckoutCallback(() => (values) => executePayment(values));
 
@@ -356,7 +362,9 @@ const WebinarModal = ({
               >
                 <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
               </button>
-              <span className="text-[18px] text-[#121927] font-medium ml-4">Back</span>
+              <span className="text-[18px] text-[#121927] font-medium ml-4">
+                Back
+              </span>
             </div>
             {webData?.type && webData?.type.toLowerCase() === "paid" && (
               <select
@@ -393,7 +401,6 @@ const WebinarModal = ({
                 )}
               </select>
             )}
-
           </div>
 
           {/* Digital Products and webinar */}
@@ -424,10 +431,12 @@ const WebinarModal = ({
                     onClick={handleViewMore}
                     // disabled={viewMoreLoading}
                     className={`mt-2 flex items-center gap-2 text-[14px] font-medium
-                     ${viewMoreLoading
-                        ? "text-[#000] cursor-not-allowed"
-                        : "text-[#1453FF] hover:underline"
-                      }`}>
+                     ${
+                       viewMoreLoading
+                         ? "text-[#000] cursor-not-allowed"
+                         : "text-[#1453FF] hover:underline"
+                     }`}
+                  >
                     {viewMoreLoading && (
                       <Image
                         src="/loader.gif"
@@ -463,14 +472,14 @@ const WebinarModal = ({
                       <p className="text-[14px] font-medium text-[#000000]">
                         {webData?.date
                           ? new Date(webData?.date).toLocaleDateString(
-                            "en-US",
-                            {
-                              weekday: "long",
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            }
-                          )
+                              "en-US",
+                              {
+                                weekday: "long",
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              }
+                            )
                           : ""}
                       </p>
                       <p className="text-[12px] text-[#787878] mt-1">
@@ -525,24 +534,24 @@ const WebinarModal = ({
                       <p className="text-[14px] font-medium text-[#000000]">
                         {webData?.startTime
                           ? new Date(webData?.startTime).toLocaleTimeString(
-                            "en-US",
-                            {
-                              hour: "numeric",
-                              minute: "2-digit",
-                              hour12: true,
-                            }
-                          )
+                              "en-US",
+                              {
+                                hour: "numeric",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
+                            )
                           : ""}{" "}
                         -{" "}
                         {webData?.endTime
                           ? new Date(webData?.endTime).toLocaleTimeString(
-                            "en-US",
-                            {
-                              hour: "numeric",
-                              minute: "2-digit",
-                              hour12: true,
-                            }
-                          )
+                              "en-US",
+                              {
+                                hour: "numeric",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
+                            )
                           : ""}
                       </p>
                       <p className="text-[12px] text-[#787878] mt-1">
@@ -556,8 +565,8 @@ const WebinarModal = ({
                   <div className="text-[24px] font-semibold text-[#000000]">
                     {webData?.type !== "free"
                       ? `${getCurrencySymbol(webData?.currency)}${formatPrice(
-                        webData?.amount
-                      )}`
+                          webData?.amount
+                        )}`
                       : "Free"}
                   </div>
                   <button
@@ -568,10 +577,10 @@ const WebinarModal = ({
                     {finished
                       ? "Event Closed"
                       : webData?.type === "free"
-                        ? "Join Webinar"
-                        : submit
-                          ? "Redirecting.."
-                          : "Make Payment"}
+                      ? "Join Webinar"
+                      : submit
+                      ? "Redirecting.."
+                      : "Make Payment"}
                   </button>
                 </div>
               </div>

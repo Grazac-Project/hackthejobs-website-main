@@ -35,7 +35,6 @@ import { RiInstagramFill } from "react-icons/ri";
 import { FaFacebook } from "react-icons/fa6";
 import { extractFirstParagraph } from "@/Utils/stringUtils";
 
-
 const groupColors = [
   "#F48025",
   "#008753",
@@ -161,7 +160,7 @@ const MentorDetails = () => {
   const [provider, setProvider] = useState("");
   const [link, setLink] = useState("");
   const [productSlug, setProductSlug] = useState("");
-
+  const [questions, setQuestions] = useState([]);
 
   const checkboxRef = useRef(null);
   // const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -281,8 +280,9 @@ const MentorDetails = () => {
   // console.log(mentData);
 
   const shareMentorProfile = () => {
-    const shareUrl = `${pathname}${searchParams.toString() ? "?" + searchParams.toString() : ""
-      }`;
+    const shareUrl = `${pathname}${
+      searchParams.toString() ? "?" + searchParams.toString() : ""
+    }`;
 
     if (navigator.share) {
       navigator
@@ -386,9 +386,11 @@ const MentorDetails = () => {
     sessionType,
     category,
     slug,
-    pricing
+    pricing,
+    questions
   ) => {
     setBookingId(id);
+    setQuestions(questions || []);
     setBookType(type);
     setProductPrice(amount);
     setProductCurrency(bookingCurrency);
@@ -443,20 +445,22 @@ const MentorDetails = () => {
     category,
     accessType,
     Slug,
-    pricing
+    pricing,
+    questions
   ) => {
     // if (token) {
     setProductId(id);
+    setQuestions(questions || []);
     setProductType(type);
     setProductPrice(amount);
     setProductCurrency(currency);
     setProductThumbnail(thumbnail);
     setProductTitle(title);
     setProductDescription(description);
-    setCategory('Digital Product');
+    setCategory("Digital Product");
     setAccessType(accessType);
-    setProductSlug(Slug)
-    setProductPricing(pricing)
+    setProductSlug(Slug);
+    setProductPricing(pricing);
     // console.log({ id });
     setShowModal(true);
     // }
@@ -480,7 +484,7 @@ const MentorDetails = () => {
 
   const AttendWebinar = (id, productSlug) => {
     setWebinarId(id);
-    setLink(`/${slug}/${productSlug}`)
+    setLink(`/${slug}/${productSlug}`);
     setShowWebModal(!showWebModal);
   };
 
@@ -509,8 +513,9 @@ const MentorDetails = () => {
     successModal && (
       <BookingModal
         mentorId={bookingId}
-        mentor={`${mentorData?.mentor?.firstName + " " + mentorData?.mentor?.lastName
-          }`}
+        mentor={`${
+          mentorData?.mentor?.firstName + " " + mentorData?.mentor?.lastName
+        }`}
         closeModal={() => setSuccessModal(false)}
       />
     );
@@ -545,7 +550,11 @@ const MentorDetails = () => {
           {/* <Navbar /> */}
 
           {error ? (
-            <Error text={error} buttonText="Create Page" path={`${baseUrl}/auth/signup`} />
+            <Error
+              text={error}
+              buttonText="Create Page"
+              path={`${baseUrl}/auth/signup`}
+            />
           ) : (
             <>
               {loading ? (
@@ -607,10 +616,11 @@ const MentorDetails = () => {
                   {successModal && (
                     <BookingModal
                       mentorId={bookingId}
-                      mentor={`${mentorData?.mentor?.firstName +
+                      mentor={`${
+                        mentorData?.mentor?.firstName +
                         " " +
                         mentorData?.mentor?.lastName
-                        }`}
+                      }`}
                       closeModal={() => setSuccessModal(false)}
                     />
                   )}
@@ -618,7 +628,7 @@ const MentorDetails = () => {
                     <PaymentModal
                       productTitle={productTitle}
                       freeMode={freeMode}
-                    // closeModal={() => setSuccessModal(false)}
+                      // closeModal={() => setSuccessModal(false)}
                     />
                   )}
                   {showWebModal && (
@@ -640,6 +650,7 @@ const MentorDetails = () => {
                       setProductDescription={setProductDescription}
                       setLoader={setLoader}
                       successPaymentModal={() => setSuccessPaymentModal(true)}
+                      setQuestions={setQuestions}
                     />
                   )}
 
@@ -743,70 +754,70 @@ const MentorDetails = () => {
                                   mentorData?.mentor?.twitterLink ||
                                   mentorData?.mentor?.facebookLink ||
                                   mentorData?.mentor?.instagramLink) && (
-                                    <div className="flex gap-2">
-                                      {mentorData?.mentor?.facebookLink && (
-                                        <a
-                                          href={mentorData.mentor.facebookLink}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
-                                        >
-                                          <Image
-                                            src="/facebook-1.svg"
-                                            width={16}
-                                            height={16}
-                                            alt="instagram"
-                                          />
-                                        </a>
-                                      )}
-                                      {mentorData?.mentor?.instagramLink && (
-                                        <a
-                                          href={mentorData.mentor.instagramLink}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
-                                        >
-                                          <Image
-                                            src="/instagram-1.svg"
-                                            width={16}
-                                            height={16}
-                                            alt="instagram"
-                                          />
-                                        </a>
-                                      )}
+                                  <div className="flex gap-2">
+                                    {mentorData?.mentor?.facebookLink && (
+                                      <a
+                                        href={mentorData.mentor.facebookLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
+                                      >
+                                        <Image
+                                          src="/facebook-1.svg"
+                                          width={16}
+                                          height={16}
+                                          alt="instagram"
+                                        />
+                                      </a>
+                                    )}
+                                    {mentorData?.mentor?.instagramLink && (
+                                      <a
+                                        href={mentorData.mentor.instagramLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
+                                      >
+                                        <Image
+                                          src="/instagram-1.svg"
+                                          width={16}
+                                          height={16}
+                                          alt="instagram"
+                                        />
+                                      </a>
+                                    )}
 
-                                      {mentorData?.mentor?.twitterLink && (
-                                        <a
-                                          href={mentorData.mentor.twitterLink}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
-                                        >
-                                          <XIcon
-                                            style={{
-                                              fontSize: 16,
-                                            }}
-                                          />
-                                        </a>
-                                      )}
+                                    {mentorData?.mentor?.twitterLink && (
+                                      <a
+                                        href={mentorData.mentor.twitterLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
+                                      >
+                                        <XIcon
+                                          style={{
+                                            fontSize: 16,
+                                          }}
+                                        />
+                                      </a>
+                                    )}
 
-                                      {mentorData?.mentor?.linkedinLink && (
-                                        <a
-                                          href={mentorData.mentor.linkedinLink}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
-                                        >
-                                          <Image
-                                            src="/linkedin-1.svg"
-                                            width={16}
-                                            height={16}
-                                            alt="linkedin"
-                                          />
-                                        </a>
-                                      )}
-                                    </div>
-                                  )}
+                                    {mentorData?.mentor?.linkedinLink && (
+                                      <a
+                                        href={mentorData.mentor.linkedinLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-[#F2F2F7] rounded-[2px] w-[42.25px] h-[32px] flex justify-center items-center"
+                                      >
+                                        <Image
+                                          src="/linkedin-1.svg"
+                                          width={16}
+                                          height={16}
+                                          alt="linkedin"
+                                        />
+                                      </a>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -814,8 +825,8 @@ const MentorDetails = () => {
                           <a href="#book-session">
                             <button
                               className={`md:hidden w-[183px]  h-[44.43px] leading-[150%] text-[12.57px] text-[#ffff] bg-primary  rounded-[6.29px] `}
-                            // onClick={bookSession}
-                            // onClick={handleNextPage}
+                              // onClick={bookSession}
+                              // onClick={handleNextPage}
                             >
                               View all packages
                             </button>
@@ -824,10 +835,11 @@ const MentorDetails = () => {
                       </div>
                       {/* First eNDING */}
                       <div
-                        className={`bg-[white] rounded-2xl ${mentorData?.reviews?.length > 0
-                          ? "flex flex-row md:flex-col" // show both sides
-                          : "flex flex-col" // left side full width
-                          }`}
+                        className={`bg-[white] rounded-2xl ${
+                          mentorData?.reviews?.length > 0
+                            ? "flex flex-row md:flex-col" // show both sides
+                            : "flex flex-col" // left side full width
+                        }`}
                       >
                         {/* <div className="w-[45%] md:w-full  ">
                           <div className="min-h-[186px] border border-[#F2F2F7] border-r-[#EAEAEA] border-b-[#EAEAEA] flex px-4 items-center justify-center gap-2 py-8 ">
@@ -886,10 +898,11 @@ const MentorDetails = () => {
                           <div className="block md:hidden h-[5%] border  border-[#fff] border-r-[#EAEAEA]   p-8 md:px-4 "></div>
                         </div> */}
                         <div
-                          className={`transition-all duration-300 ${mentorData?.reviews?.length > 0
-                            ? "w-[55%] md:w-full  border-[#EAEAEA]" // when reviews exist
-                            : "w-full" // no reviews → full width
-                            }`}
+                          className={`transition-all duration-300 ${
+                            mentorData?.reviews?.length > 0
+                              ? "w-[55%] md:w-full  border-[#EAEAEA]" // when reviews exist
+                              : "w-full" // no reviews → full width
+                          }`}
                         >
                           <div className="py-6 md:py-4 md:px-4 sm:px-0 border border-[#fff] border-b-[#EAEAEA] ">
                             <div className="flex justify-between items-center border border-[#fff] border-b-[#EAEAEA] mx-12 md:mx-4 py-[8.5px]  ">
@@ -952,12 +965,12 @@ const MentorDetails = () => {
                                     </h4>
                                     {mentorData?.mentor?.yearsOfExperience >
                                       0 && (
-                                        <div className="border border-primary w-[77px] h-6 text-primary text-[14px] font-medium leading-[120%] flex justify-center items-center text-center">
-                                          {mentorData?.mentor?.yearsOfExperience +
-                                            " " +
-                                            "years" || ""}
-                                        </div>
-                                      )}
+                                      <div className="border border-primary w-[77px] h-6 text-primary text-[14px] font-medium leading-[120%] flex justify-center items-center text-center">
+                                        {mentorData?.mentor?.yearsOfExperience +
+                                          " " +
+                                          "years" || ""}
+                                      </div>
+                                    )}
                                   </div>
                                   <div className="flex flex-col gap-4">
                                     {mentorData?.mentor?.experience?.map(
@@ -998,14 +1011,14 @@ const MentorDetails = () => {
                                               -{" "}
                                               {exp.endDate
                                                 ? new Date(
-                                                  exp.endDate
-                                                ).toLocaleDateString(
-                                                  "en-US",
-                                                  {
-                                                    year: "numeric",
-                                                    month: "short",
-                                                  }
-                                                )
+                                                    exp.endDate
+                                                  ).toLocaleDateString(
+                                                    "en-US",
+                                                    {
+                                                      year: "numeric",
+                                                      month: "short",
+                                                    }
+                                                  )
                                                 : "Present"}
                                             </p>
                                           </div>
@@ -1080,26 +1093,27 @@ const MentorDetails = () => {
                                         </div>
                                         <div className="flex  items-center gap-2 ">
                                           <div className="flex items-center ">
-                                            {Array.from({ length: 5 }).map((_, i) =>
-                                              i < element.rating ? (
-                                                <Image
-                                                  key={i}
-                                                  src="/rate.svg"
-                                                  alt="star"
-                                                  width={14}
-                                                  height={14}
-                                                  className=""
-                                                />
-                                              ) : (
-                                                <Image
-                                                  key={i}
-                                                  src="/rate2.svg"
-                                                  alt="star"
-                                                  width={14}
-                                                  height={14}
-                                                  className=""
-                                                />
-                                              )
+                                            {Array.from({ length: 5 }).map(
+                                              (_, i) =>
+                                                i < element.rating ? (
+                                                  <Image
+                                                    key={i}
+                                                    src="/rate.svg"
+                                                    alt="star"
+                                                    width={14}
+                                                    height={14}
+                                                    className=""
+                                                  />
+                                                ) : (
+                                                  <Image
+                                                    key={i}
+                                                    src="/rate2.svg"
+                                                    alt="star"
+                                                    width={14}
+                                                    height={14}
+                                                    className=""
+                                                  />
+                                                )
                                             )}
                                           </div>
                                           <div className="flex items-center gap-2">
@@ -1122,7 +1136,6 @@ const MentorDetails = () => {
                         )}
                       </div>
                     </div>
-
 
                     <div className=" mx-auto mt-3" id="book-session">
                       <section className="flex flex-col  gap-2 bg-[#ffff] border border-[#EAEAEA] p-8  bg-[#ffffff] py-6  lg:px-10 md:px-4 mb-[10px]  rounded-[8px] w-[1084px] xl:w-[95%] min-h-[212px]  m-auto">
@@ -1154,7 +1167,8 @@ const MentorDetails = () => {
                                         book?.category,
                                         book?.accessType,
                                         book?.slug,
-                                        book?.pricing
+                                        book?.pricing,
+                                        book?.questions
                                       )
                                     }
                                   >
@@ -1208,8 +1222,13 @@ const MentorDetails = () => {
                                     let amount = details?.amount;
                                     let currency = details?.currency;
 
-                                    if ((!amount || Number(amount) === 0) && pricing.length > 0) {
-                                      const match = pricing.find((p) => p.currency === currency);
+                                    if (
+                                      (!amount || Number(amount) === 0) &&
+                                      pricing.length > 0
+                                    ) {
+                                      const match = pricing.find(
+                                        (p) => p.currency === currency
+                                      );
                                       if (match) {
                                         amount = match.amount;
                                         currency = match.currency;
@@ -1233,20 +1252,23 @@ const MentorDetails = () => {
                                               details?.description,
                                               details?.title,
                                               null,
-                                              '1-on-1 Session',
+                                              "1-on-1 Session",
                                               details?.slug,
-                                              details?.pricing
+                                              details?.pricing,
+                                              details?.questions
                                             )
                                           }
                                         >
                                           <div className="flex gap-[16px] justify-between items-center mb-[10px] ">
                                             <div
-                                              className={` h-[22px] px-3 rounded-full flex items-center justify-center ${details.bookingType === "Paid"
-                                                ? " bg-[#DEA8061A]"
-                                                : " bg-[#3333331A]"
-                                                }`}
+                                              className={` h-[22px] px-3 rounded-full flex items-center justify-center ${
+                                                details.bookingType === "Paid"
+                                                  ? " bg-[#DEA8061A]"
+                                                  : " bg-[#3333331A]"
+                                              }`}
                                             >
-                                              {details.bookingType === "Paid" && (
+                                              {details.bookingType ===
+                                                "Paid" && (
                                                 <Image
                                                   src="/paid.svg"
                                                   alt="mentor"
@@ -1256,20 +1278,22 @@ const MentorDetails = () => {
                                                 />
                                               )}
                                               <span
-                                                className={` text-[12px] font-medium leading-[18px] font-inter ${details?.bookingType === "Paid"
-                                                  ? "text-[#F3B704]"
-                                                  : "text-[#333333]"
-                                                  } `}
+                                                className={` text-[12px] font-medium leading-[18px] font-inter ${
+                                                  details?.bookingType ===
+                                                  "Paid"
+                                                    ? "text-[#F3B704]"
+                                                    : "text-[#333333]"
+                                                } `}
                                               >
-                                                {capitalizeFirstLetter(details?.bookingType)}
+                                                {capitalizeFirstLetter(
+                                                  details?.bookingType
+                                                )}
                                               </span>
                                             </div>
                                             {details.bookingType === "Paid" && (
                                               <div className=" flex items-center gap-1 justify-center">
                                                 <span className="text-[#333333] text-[14px] font-bold leading-[140%] font-inter ">
-                                                  {getCurrencySymbol(
-                                                    currency
-                                                  )}
+                                                  {getCurrencySymbol(currency)}
                                                   {formatPrice(amount)}
                                                 </span>
                                               </div>
@@ -1280,7 +1304,9 @@ const MentorDetails = () => {
                                             {details?.title}
                                           </div>
                                           <p className="text-xs text-[#878787] leading=[140%] line-clamp-3">
-                                            {extractFirstParagraph(details?.description)}
+                                            {extractFirstParagraph(
+                                              details?.description
+                                            )}
                                           </p>
                                           <div className="flex justify-between items-center">
                                             <div className="text-xs">
@@ -1293,7 +1319,7 @@ const MentorDetails = () => {
                                           </div>
                                         </div>
                                       </div>
-                                    )
+                                    );
                                   }
                                 )}
                               </div>
@@ -1313,8 +1339,13 @@ const MentorDetails = () => {
                                     let amount = pkg?.amount;
                                     let currency = pkg?.currency;
 
-                                    if ((!amount || Number(amount) === 0) && pricing.length > 0) {
-                                      const match = pricing.find((p) => p.currency === currency);
+                                    if (
+                                      (!amount || Number(amount) === 0) &&
+                                      pricing.length > 0
+                                    ) {
+                                      const match = pricing.find(
+                                        (p) => p.currency === currency
+                                      );
                                       if (match) {
                                         amount = match.amount;
                                         currency = match.currency;
@@ -1338,7 +1369,8 @@ const MentorDetails = () => {
                                             "mentorship",
                                             "Package",
                                             pkg?.slug,
-                                            pkg?.pricing
+                                            pkg?.pricing,
+                                            pkg?.questions
                                           )
                                         }
                                       >
@@ -1347,7 +1379,7 @@ const MentorDetails = () => {
                                           style={{
                                             borderTopColor:
                                               groupColors[
-                                              idx % groupColors.length
+                                                idx % groupColors.length
                                               ],
                                           }}
                                         >
@@ -1355,13 +1387,14 @@ const MentorDetails = () => {
                                             <span
                                               className="text-xs px-2 py-1 rounded-[32px] font-medium"
                                               style={{
-                                                backgroundColor: `${groupColors[
-                                                  idx % groupColors.length
-                                                ]
-                                                  }1A`,
+                                                backgroundColor: `${
+                                                  groupColors[
+                                                    idx % groupColors.length
+                                                  ]
+                                                }1A`,
                                                 color:
                                                   groupColors[
-                                                  idx % groupColors.length
+                                                    idx % groupColors.length
                                                   ],
                                               }}
                                             >
@@ -1371,7 +1404,7 @@ const MentorDetails = () => {
                                                 : "Week"}
                                             </span>
                                             {pkg?.bookingType.toLowerCase() ===
-                                              "paid" ? (
+                                            "paid" ? (
                                               <div className="text-right text-sm font-semibold">
                                                 {getCurrencySymbol(currency)}
                                                 {formatPrice(amount)}
@@ -1386,7 +1419,9 @@ const MentorDetails = () => {
                                             {pkg?.title}
                                           </div>
                                           <p className="text-xs text-gray-600 line-clamp-2">
-                                            {extractFirstParagraph(pkg?.description)}
+                                            {extractFirstParagraph(
+                                              pkg?.description
+                                            )}
                                           </p>
                                           <div className="flex justify-between items-center">
                                             <div className="flex items-center gap-2">
@@ -1395,8 +1430,8 @@ const MentorDetails = () => {
                                               </span>
                                               <span className=" w-2 h-2 bg-[#D9D9D9] rounded-full"></span>
                                               <span className="text-[12px] leading-[140%] text-[#4F4F4F] ">
-                                                {duration(pkg?.sessionsPerWeek)} a
-                                                week
+                                                {duration(pkg?.sessionsPerWeek)}{" "}
+                                                a week
                                               </span>
                                             </div>
                                             <p className="text-sm text-primary font-medium flex items-center">
@@ -1424,8 +1459,13 @@ const MentorDetails = () => {
                                   let amount = webinar?.amount;
                                   let currency = webinar?.currency;
 
-                                  if ((!amount || Number(amount) === 0) && pricing.length > 0) {
-                                    const match = pricing.find((p) => p.currency === currency);
+                                  if (
+                                    (!amount || Number(amount) === 0) &&
+                                    pricing.length > 0
+                                  ) {
+                                    const match = pricing.find(
+                                      (p) => p.currency === currency
+                                    );
                                     if (match) {
                                       amount = match.amount;
                                       currency = match.currency;
@@ -1449,11 +1489,15 @@ const MentorDetails = () => {
                                       currency={currency}
                                       amount={amount}
                                       key={id}
-                                      action={() => AttendWebinar(webinar._id, webinar?.slug)}
+                                      action={() =>
+                                        AttendWebinar(
+                                          webinar._id,
+                                          webinar?.slug
+                                        )
+                                      }
                                     />
-                                  )
-                                }
-                                )}
+                                  );
+                                })}
                               </div>
                             </div>
                           )}
@@ -1504,6 +1548,7 @@ const MentorDetails = () => {
           productCurrency={productCurrency}
           productType={productType || bookType}
           category={category}
+          questions={questions}
         />
       )}
     </>

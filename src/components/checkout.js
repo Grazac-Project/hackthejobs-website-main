@@ -11,17 +11,36 @@ import { allProductCheckout } from "@/api/authentication/auth";
 import { getCurrencySymbol } from "@/Utils/currency-formatter";
 import { extractFirstParagraph } from "@/Utils/stringUtils";
 
-
-
 const initialValues = {
   firstName: "",
   lastName: "",
   email: "",
 };
 
-const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, productDescription, productTitle, productPrice, productCurrency, productType, category,}) => {
+const Checkout = ({
+  loader,
+  setLoader,
+  goBack,
+  checkoutCallback,
+  productId,
+  productDescription,
+  productTitle,
+  productPrice,
+  productCurrency,
+  productType,
+  category,
+  questions = [],
+}) => {
   const router = useRouter();
   // const [loader, setLoader] = useState(false);
+
+  const dynamicInitialValues = {
+    ...initialValues,
+    ...questions.reduce((acc, q) => {
+      acc[q.questionText] = "";
+      return acc;
+    }, {}),
+  };
 
   const schema = yup.object({
     firstName: yup.string().required("Firstname is required"),
@@ -30,6 +49,16 @@ const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, produ
       .string()
       .email("Please enter a valid email address")
       .required("Email is required"),
+    ...questions.reduce((acc, q) => {
+      if (q.isRequired) {
+        acc[q.questionText] = yup
+          .string()
+          .required(`${q.questionText} is required`);
+      } else {
+        acc[q.questionText] = yup.string();
+      }
+      return acc;
+    }, {}),
   });
 
   const onSubmit = async (values, actions) => {
@@ -37,9 +66,9 @@ const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, produ
     const newValues = {
       ...values,
       productId: productId,
-      currency: productCurrency
-    }
-    checkoutCallback(newValues)
+      currency: productCurrency,
+    };
+    checkoutCallback(newValues);
   };
 
   const {
@@ -51,9 +80,10 @@ const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, produ
     errors,
     touched,
   } = useFormik({
-    initialValues,
+    initialValues: dynamicInitialValues,
     validationSchema: schema,
     onSubmit,
+    enableReinitialize: true,
   });
 
   function truncateString(str) {
@@ -76,7 +106,7 @@ const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, produ
         <div className=" flex gap-[16px] items-center mb-8 xm:mb-5">
           <div
             className="border-[1px] border-[#EAEAEA] rounded-[8px] p-[10px] cursor-pointer"
-              onClick={goBack}
+            onClick={goBack}
           >
             <IoIosArrowRoundBack className="text-[16px] text-[#292D32]" />
           </div>
@@ -100,19 +130,25 @@ const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, produ
               </h2>
               {productPrice && productPrice !== 0 ? (
                 <p className="font-bold text-[16px] text-[#292D32] leading-[22px]">
-                  {getCurrencySymbol(productCurrency)}{String(productPrice)}
+                  {getCurrencySymbol(productCurrency)}
+                  {String(productPrice)}
                 </p>
               ) : (
-                <p className="font-bold text-[16px] text-[#292D32] leading-[22px]">Free</p>
+                <p className="font-bold text-[16px] text-[#292D32] leading-[22px]">
+                  Free
+                </p>
               )}
             </div>
           </div>
           <div>
             <h2 className="font-normal text-[14px] text-[#101828] leading-[180%] tracking-[0] mb-2">
-             {category?.toLowerCase() === "webinar" ? "Webinar title" : "Product name"}
+              {category?.toLowerCase() === "webinar"
+                ? "Webinar title"
+                : "Product name"}
             </h2>
             <p className="font-bold text-[16px] text-[#292D32] leading-[22px]">
-              {productTitle || truncateString(extractFirstParagraph(productDescription))}
+              {productTitle ||
+                truncateString(extractFirstParagraph(productDescription))}
             </p>
           </div>
         </div>
@@ -190,6 +226,34 @@ const Checkout = ({loader, setLoader, goBack, checkoutCallback, productId, produ
               className="font-normal text-[14px] leading-[120%] tracking-[0] block text-[#828282] border-[1px] border-[#EAEAEA] h-[48px] w-[100%] rounded-[8px] p-[15px] outline-none"
             />
           </div>
+
+          {questions.map((q, index) => (
+            <div key={index} className="mb-8 xm:mb-5">
+              <div className="">
+                <label
+                  htmlFor={q.questionText}
+                  className={`text-[16px] leading-[140%] tracking-[0] mb-2 block ${
+                    errors[q.questionText] && touched[q.questionText]
+                      ? "text-[#fc8181]"
+                      : "text-[#333333] "
+                  }`}
+                >
+                  {errors[q.questionText] && touched[q.questionText]
+                    ? `${errors[q.questionText]}`
+                    : q.questionText}  {q.isRequired === false && <span className="">(optional)</span>} 
+                </label>
+              </div>
+              <input
+                type={q.questionType || "text"}
+                id={q.questionText}
+                placeholder={`Enter ${q.questionText.toLowerCase()}`}
+                value={values[q.questionText]}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className="font-normal text-[14px] leading-[120%] tracking-[0] block text-[#828282] border-[1px] border-[#EAEAEA] h-[48px] w-[100%] rounded-[8px] p-[15px] outline-none"
+              />
+            </div>
+          ))}
           <button className="flex justify-center items-center w-[100%] bg-[#1453FF] border-[0.3px] border-[#654DE4] rounded-[4px] h-[48px] text-[#fff] mb-[24px]">
             {loader ? (
               <Image

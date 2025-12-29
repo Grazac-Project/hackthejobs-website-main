@@ -40,7 +40,6 @@ const DigitalProduct = () => {
   const [main, setMain] = useState(true);
   const [fetchingProduct, setFetchingProduct] = useState(true);
 
-
   const isProduction = process.env.NEXT_PUBLIC_DOMAIN_DEV;
   const baseUrl =
     isProduction === "development"
@@ -86,7 +85,7 @@ const DigitalProduct = () => {
         console.error("Error fetching product:", err);
         setError(
           err.response?.data?.message ||
-          "Failed to load product. Please try again."
+            "Failed to load product. Please try again."
         );
       } finally {
         setFetchingProduct(false);
@@ -117,15 +116,16 @@ const DigitalProduct = () => {
       console.log("Free Product Response:", res.data);
 
       setLoading(false);
-      setSuccess(true)
-      setFreeMode(true)
+      setSuccess(true);
+      setFreeMode(true);
       // successPaymentModal();
       setCheckout(false);
       setMain(true);
-
     } catch (error) {
       console.log("initializeDigitalProductPayment error:", error);
-      toast.error(error?.response?.data?.message || "Failed to process free product");
+      toast.error(
+        error?.response?.data?.message || "Failed to process free product"
+      );
       setLoading(false);
     }
   };
@@ -180,7 +180,7 @@ const DigitalProduct = () => {
                 setMain(true);
                 setCheckout(false);
                 setLoading(false);
-                setSuccess(true)
+                setSuccess(true);
                 // successPaymentModal();
               },
             });
@@ -204,7 +204,7 @@ const DigitalProduct = () => {
         console.error("Error in checkout data call:", err);
         toast.error(
           err.response?.data?.message ||
-          "An error occurred initializing payment."
+            "An error occurred initializing payment."
         );
         setLoading(false);
         return;
@@ -314,7 +314,6 @@ const DigitalProduct = () => {
     GBP: "£",
   };
 
-
   const handleClose = () => {
     const isProduction = process.env.NEXT_PUBLIC_DOMAIN_DEV;
 
@@ -376,7 +375,8 @@ const DigitalProduct = () => {
                 <div className="flex items-center justify-between mb-[35px]">
                   <div
                     onClick={() => router.push(`/${username}`)}
-                    className="flex items-center gap-[12px]  p-[8px] rounded-[8px] bg-[#FAFAFA] w-[210px] xm:w-[168px] whitespace-nowrap cursor-pointer border border-[#EDEDED] truncate sxm:hidden">
+                    className="flex items-center gap-[12px]  p-[8px] rounded-[8px] bg-[#FAFAFA] w-[210px] xm:w-[168px] whitespace-nowrap cursor-pointer border border-[#EDEDED] truncate sxm:hidden"
+                  >
                     <Image
                       src={product?.profilePic}
                       alt="profilepics"
@@ -384,7 +384,9 @@ const DigitalProduct = () => {
                       height={32}
                     />
                     <div className="flex flex-col">
-                      <p className="text-[12px] text-[#101828] mb-[2px] font-normal">Listed by</p>
+                      <p className="text-[12px] text-[#101828] mb-[2px] font-normal">
+                        Listed by
+                      </p>
                       <p className="text-[16px] text-[#101828] xm:text-[12px] font-medium truncate">
                         {seller?.firstName} {seller?.lastName}
                       </p>
@@ -401,48 +403,50 @@ const DigitalProduct = () => {
                     <span className="text-2xl font-semibold ml-2">Back</span>
                   </div>
                   {product?.type && product.type.toLowerCase() === "paid" && (
-                  <select
-                    className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
-                    value={product?.currency}
-                    onChange={(e) => {
-                      const selectedCurrency = e.target.value;
-                      const pricingOption = product?.pricing?.find(
-                        (p) => p.currency === selectedCurrency
-                      );
-                      if (pricingOption) {
-                        setProduct((prev) => ({
-                          ...prev,
-                          amount: pricingOption.amount,
-                          currency: pricingOption.currency,
-                        }));
-                        setProductData((prev) => ({
-                          ...prev,
-                          amount: pricingOption.amount,
-                          currency: pricingOption.currency,
-                        }));
-                      } else {
-                        // For old items without pricing, just update currency
-                        setProduct((prev) => ({
-                          ...prev,
-                          currency: selectedCurrency,
-                        }));
-                        setProductData((prev) => ({
-                          ...prev,
-                          currency: selectedCurrency,
-                        }));
-                      }
-                    }}
-                  >
-                    {product?.pricing && product.pricing.length > 0 ? (
-                      product.pricing.map((price) => (
-                        <option key={price._id} value={price.currency}>
-                          {price.currency}
+                    <select
+                      className="font-normal font-satoshi leading-[100%] tracking-[0] text-[12px] bg-[#F9FAFF] text-[#4F4F4F] border border-[#EAEAEA] px-[12px] py-[9.5px] rounded-[8px] outline-none cursor-pointer w-[79px]"
+                      value={product?.currency}
+                      onChange={(e) => {
+                        const selectedCurrency = e.target.value;
+                        const pricingOption = product?.pricing?.find(
+                          (p) => p.currency === selectedCurrency
+                        );
+                        if (pricingOption) {
+                          setProduct((prev) => ({
+                            ...prev,
+                            amount: pricingOption.amount,
+                            currency: pricingOption.currency,
+                          }));
+                          setProductData((prev) => ({
+                            ...prev,
+                            amount: pricingOption.amount,
+                            currency: pricingOption.currency,
+                          }));
+                        } else {
+                          // For old items without pricing, just update currency
+                          setProduct((prev) => ({
+                            ...prev,
+                            currency: selectedCurrency,
+                          }));
+                          setProductData((prev) => ({
+                            ...prev,
+                            currency: selectedCurrency,
+                          }));
+                        }
+                      }}
+                    >
+                      {product?.pricing && product.pricing.length > 0 ? (
+                        product.pricing.map((price) => (
+                          <option key={price._id} value={price.currency}>
+                            {price.currency}
+                          </option>
+                        ))
+                      ) : (
+                        <option value={product?.currency}>
+                          {product?.currency}
                         </option>
-                      ))
-                    ) : (
-                      <option value={product?.currency}>{product?.currency}</option>
-                    )}
-                  </select>
+                      )}
+                    </select>
                   )}
                 </div>
 
@@ -476,12 +480,15 @@ const DigitalProduct = () => {
                     <hr className="border border-[#EAEAEA] " />
 
                     <div className="text-sm font-normal tracking-[0.08em] mt-4 text-[#333333] max-h-[200px] overflow-y-hidden">
-                      {extractFirstParagraph (product?.description) || ""}
+                      {extractFirstParagraph(product?.description) || ""}
                     </div>
                     <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">
                       <div className="text-[18px] font-bold text-[#333333]">
                         {product?.type === "paid"
-                          ? `${currencySymbols[product?.currency] || product?.currency}${formatPrice(product?.amount)}`
+                          ? `${
+                              currencySymbols[product?.currency] ||
+                              product?.currency
+                            }${formatPrice(product?.amount)}`
                           : "Free"}
                       </div>
                       <button
@@ -489,7 +496,9 @@ const DigitalProduct = () => {
                         // onClick={handleClick}
                         onClick={openCheckout}
                       >
-                        {product?.type === "paid" ? "Make Payment" : "Access Now"}
+                        {product?.type === "paid"
+                          ? "Make Payment"
+                          : "Access Now"}
                       </button>
                     </div>
                   </div>
@@ -551,6 +560,7 @@ const DigitalProduct = () => {
           productCurrency={product.currency}
           productType={product.type}
           category={product.category}
+          questions={product.extraQuestions || []}
         />
       )}
     </div>
