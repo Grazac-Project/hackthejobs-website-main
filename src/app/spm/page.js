@@ -62,7 +62,7 @@ const spm = () => {
     dotsClass: "slick-dots custom-dots",
     // beforeChange: (current, next) => {console.log(current);
     //   console.log(next);
-    //   setCurrentSlide(next)},
+    //   setCurrentSlide(next)},,
 
     afterChange: (index) => {
       setDotPosition(index);
