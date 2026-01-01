@@ -19,7 +19,7 @@ const page = () => {
           <div className={Classes.content}>
             <h3>Email verification</h3>
             <p>
-              We are happy to have you back. Provide the correct information
+              We are happy to have you back. Provide the correct information.
             </p>
             <div className={Classes.pinflex}>
               <div className={Classes.pin}>7</div>
