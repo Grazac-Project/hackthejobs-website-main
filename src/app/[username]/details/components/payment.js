@@ -398,7 +398,7 @@ const Payment = ({
                     <FiEye className="text-[#333333]" />
                   )}
                   <p className="font-medium text-xs text-[#333333]">
-                    {accessType ? "Download" : "View Only"}
+                    {accessType ? "Downloadable" : "View Only"}
                   </p>
                 </button>
               </div>
@@ -436,7 +436,7 @@ const Payment = ({
                   View more
                 </button> */}
 
-              <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-[99px] xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">
+              <div className="flex justify-between items-center border border-[#EAEAEA] bg-[#FAFAFA] p-[16px] rounded-[8px] mt-auto xm:mt-0 xm:fixed xm:bottom-0 xm:left-0 xm:right-0 xm:z-50 xm:w-full">
                 <div className="text-[18px] font-bold text-[#333333]">
                   {productType === "paid"
                     ? `${
